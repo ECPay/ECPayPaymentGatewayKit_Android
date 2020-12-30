@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="mModel"
+            type="tw.com.ecpay.paymentgatewaykit.example.gateway.model.GatewaySDKModel" />
+
+        <variable
+            name="mPresenter"
+            type="tw.com.ecpay.paymentgatewaykit.example.gateway.presenter.GatewaySDKPresenter" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{mModel.description}"
+                android:textSize="17sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{mModel.sdkVersion}"
+                android:textSize="17sp" />
+
+            <LinearLayout
+                android:id="@+id/googlePayLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/googlePayButton"
+                    layout="@layout/googlepay_button"
+                    android:onClick="@{(view) -> mPresenter.onGooglePay()}"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/samsungPayLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/samsung_pay_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    android:onClick="@{(view) -> mPresenter.onSamsungPay()}"
+                    android:src="@drawable/pay_rectangular_full_screen_black" />
+            </LinearLayout>
+
+            <RadioGroup
+                android:checkedButton="@={mModel.getTokenType}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <RadioButton
+                    android:id="@+id/getTokenType1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="模擬取得訂單Token(付款選擇頁)" />
+
+                <RadioButton
+                    android:id="@+id/getTokenType2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="模擬取得訂單Token(國旅卡)" />
+
+                <RadioButton
+                    android:id="@+id/getTokenType3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="模擬取得訂單Token(定期定額)" />
+
+                <RadioButton
+                    android:id="@+id/getTokenType4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="模擬取得UserToken" />
+            </RadioGroup>
+
+            <Switch
+                android:id="@+id/threeDSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="@={mModel.threeDSwitch}"
+                android:onClick="@{(view) -> mPresenter.onThreeDSwitch()}"
+                android:text="是否3D驗證" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="@{(view) -> mPresenter.onSdkGetToken()}"
+                android:text="模擬取得Token" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="token"
+                android:text="@={mModel.token}"
+                android:inputType="textPersonName" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Language" />
+
+            <Spinner
+                android:id="@+id/spinnerLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:selectedItemPosition="@={mModel.languageSelectedPosition}"
+                android:entries="@array/languageArray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/useResultPageSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="@={mModel.useResultPageSwitch}"
+                    android:text="UseResultPage" />
+
+            </LinearLayout>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:hint="Xml MerchantID"
+                android:text="@={mModel.xmlMerchantID}" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="@{(view) -> mPresenter.onPayment()}"
+                android:text="呼叫付款" />
+
+        </LinearLayout>
+    </ScrollView>
+</layout>

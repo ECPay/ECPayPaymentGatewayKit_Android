@@ -1,4 +1,5 @@
 # 站內付2.0_Android版
+[ ![Download](https://api.bintray.com/packages/ecpay/paymentgatewaykit-android/ECPayPaymentGatewayKit/images/download.svg) ](hhttps://bintray.com/ecpay/paymentgatewaykit-android/ECPayPaymentGatewayKit/_latestVersion)
 
 
 ## About
@@ -17,7 +18,7 @@ ECPay Payment SDK公開於[JCenter](https://bintray.com/bintray/jcenter)來源�
 ````gradle
 dependencies {
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay.paymentkit:ECPayPaymentGatewayKit:1.0.0'
+    implementation 'tw.com.ecpay.paymentgatewaykit:ECPayPaymentGatewayKit:1.0.0'
 }
 ````
 請於````project/build.gradle````檔案加入[JCenter](https://bintray.com/bintray/jcenter)
@@ -33,7 +34,7 @@ buildscript {
 
 ### Import
 ````java
-import tw.com.ecpay.paymentkit.manager.*
+tw.com.ecpay.paymentgatewaykit.manager
 ````
 
 * ### Initialize

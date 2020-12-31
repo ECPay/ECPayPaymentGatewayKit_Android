@@ -1,5 +1,5 @@
 # 站內付2.0_Android版
-[ ![Download](https://api.bintray.com/packages/ecpay/paymentgatewaykit-android/ECPayPaymentGatewayKit/images/download.svg) ](hhttps://bintray.com/ecpay/paymentgatewaykit-android/ECPayPaymentGatewayKit/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/ecpay/paymentgatewaykit-android/ECPayPaymentGatewayKit/images/download.svg) ](https://bintray.com/ecpay/paymentgatewaykit-android/ECPayPaymentGatewayKit/_latestVersion)
 
 
 ## About
@@ -34,7 +34,7 @@ buildscript {
 
 ### Import
 ````java
-tw.com.ecpay.paymentgatewaykit.manager
+import tw.com.ecpay.paymentgatewaykit.manager.*
 ````
 
 * ### Initialize

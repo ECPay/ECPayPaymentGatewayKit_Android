@@ -1,5 +1,4 @@
-# ECPay Payment Gateway SDK for Android
-
+# 站內付2.0_Android版
 
 
 ## About

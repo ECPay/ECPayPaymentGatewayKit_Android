@@ -52,7 +52,7 @@ SDK 涵蓋以下環境
 ````
 
 
-* ### CreditPayment
+* ### CreatePayment
 產生信用卡刷卡功能
 ````
 PaymentkitManager.createPayment(mActivity, mFragment,

@@ -18,7 +18,7 @@ ECPay Payment SDK公開於[JCenter](https://bintray.com/bintray/jcenter)來源�
 ````gradle
 dependencies {
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay.paymentgatewaykit:ECPayPaymentGatewayKit:1.0.0'
+    implementation 'tw.com.ecpay.paymentgatewaykit:ECPayPaymentGatewayKit:1.0.1'
 }
 ````
 請於````project/build.gradle````檔案加入[JCenter](https://bintray.com/bintray/jcenter)

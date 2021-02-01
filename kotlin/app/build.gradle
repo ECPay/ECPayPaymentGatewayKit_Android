@@ -83,7 +83,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines"
 
-    implementation 'tw.com.ecpay.paymentgatewaykit:ECPayPaymentGatewayKit:1.0.1'
+    implementation 'tw.com.ecpay.paymentgatewaykit:ECPayPaymentGatewayKit:1.0.2'
 
     testImplementation 'junit:junit:4.12'
 

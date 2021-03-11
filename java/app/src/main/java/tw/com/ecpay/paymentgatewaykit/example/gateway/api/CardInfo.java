@@ -80,12 +80,14 @@ public class CardInfo {
                     int PeriodAmount,
                     String PeriodType,
                     int Frequency,
-                    int ExecTimes) {
+                    int ExecTimes,
+                    String PeriodReturnURL) {
         this.OrderResultURL = OrderResultURL;
         this.PeriodAmount = PeriodAmount;
         this.PeriodType = PeriodType;
         this.Frequency = Frequency;
         this.ExecTimes = ExecTimes;
+        this.PeriodReturnURL = PeriodReturnURL;
     }
 
     public CardInfo(String Redeem,

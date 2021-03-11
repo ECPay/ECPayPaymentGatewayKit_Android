@@ -1,18 +1,65 @@
 package tw.com.ecpay.paymentgatewaykit.example.gateway.api
 
 data class CardInfo(
-    var Redeem: String? = null,
-    var OrderResultURL: String? = null,
+    var OrderResultURL: String? = null
+) {
+    var Redeem: String? = null
+
     // ----------------------------------------- 定期定額
-    var PeriodAmount: Int,
-    var PeriodType: String? = null,
-    var Frequency: Int,
-    var ExecTimes: Int,
-    var PeriodReturnURL: String? = null,
+    var PeriodAmount: Int = 0
+    var PeriodType: String? = null
+    var Frequency: Int = 0
+    var ExecTimes: Int = 0
+    var PeriodReturnURL: String? = null
+
     // ----------------------------------------- 刷卡分期
-    var CreditInstallment: String? = null,
+    var CreditInstallment: String? = null
+
     // ----------------------------------------- 國旅卡
-    var TravelStartDate: String? = null,
-    var TravelEndDate: String? = null,
+    var TravelStartDate: String? = null
+    var TravelEndDate: String? = null
     var TravelCounty: String? = null
-)
+
+    constructor (
+        Redeem: String,
+        OrderResultURL: String,
+        CreditInstallment: String
+    ) : this(
+        OrderResultURL
+    ) {
+        this.Redeem = Redeem
+        this.CreditInstallment = CreditInstallment
+    }
+
+    constructor (
+        OrderResultURL: String,
+        PeriodAmount: Int,
+        PeriodType: String,
+        Frequency: Int,
+        ExecTimes: Int,
+        PeriodReturnURL: String
+    ) : this(
+        OrderResultURL
+    ) {
+        this.PeriodAmount = PeriodAmount
+        this.PeriodType = PeriodType
+        this.Frequency = Frequency
+        this.ExecTimes = ExecTimes
+        this.PeriodReturnURL = PeriodReturnURL
+    }
+
+    constructor (
+        Redeem: String,
+        OrderResultURL: String,
+        TravelStartDate: String,
+        TravelEndDate: String,
+        TravelCounty: String
+    ) : this(
+        OrderResultURL
+    ) {
+        this.Redeem = Redeem
+        this.TravelStartDate = TravelStartDate
+        this.TravelEndDate = TravelEndDate
+        this.TravelCounty = TravelCounty
+    }
+}

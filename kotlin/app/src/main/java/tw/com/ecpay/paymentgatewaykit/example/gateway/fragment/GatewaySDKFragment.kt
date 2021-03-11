@@ -43,7 +43,7 @@ class GatewaySDKFragment : Fragment() {
             container, false)
         mModel = GatewaySDKModel()
         mModel.init()
-        mExampleData = genExampleData()
+        mExampleData = ExampleData()
         mPresenter = GatewaySDKPresenter(activity!!, this, mModel, mExampleData)
         binding.mModel = mModel
         binding.mPresenter = mPresenter
@@ -76,19 +76,4 @@ class GatewaySDKFragment : Fragment() {
         binding.samsungPayLayout.visibility = View.GONE
     }
 
-    private fun genExampleData(): ExampleData {
-        val merchantID: String = "2000132"
-        val aesKey: String = "5294y06JbISpM5x9"
-        val aesIv: String = "v77hoKGq4kWxNNIS"
-        val revision: String = "1.0.0"
-        val email: String = "techsupport@ecpay.com.tw"
-        val phone: String = "0900123456"
-        val name: String = "綠界科技"
-        val countryCode: String = "158"
-        val address: String = "台北市南港區三重路19-2號 6號棟樓之2, D"
-        val appStoreName: String = "綠界測試商店"
-        val merchantMemberID: String = "123456"
-        return ExampleData(merchantID, aesKey, aesIv, revision, email, phone, name,
-            countryCode, address, appStoreName, merchantMemberID)
-    }
 }

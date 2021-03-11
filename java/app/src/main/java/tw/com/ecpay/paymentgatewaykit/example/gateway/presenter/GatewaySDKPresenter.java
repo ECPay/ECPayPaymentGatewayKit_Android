@@ -40,11 +40,9 @@ import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfoCallbackData;
 import tw.com.ecpay.paymentgatewaykit.manager.ServerType;
 import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfoCallbackData;
 import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfo;
-import tw.com.ecpay.paymentgatewaykit.manager.GooglePayCallback;
 import tw.com.ecpay.paymentgatewaykit.manager.LanguageCode;
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentType;
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentkitManager;
-import tw.com.ecpay.paymentgatewaykit.manager.SamsungPayCallback;
 import tw.com.ecpay.paymentgatewaykit.example.util.UIUtil;
 
 public class GatewaySDKPresenter {
@@ -120,6 +118,18 @@ public class GatewaySDKPresenter {
                                 sb.append("\r\n");
                                 sb.append(getPaymentTypeName(callbackData.getPaymentType()));
                                 sb.append("\r\n");
+                                sb.append("PlatformID:");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getPlatformID());
+                                sb.append("\r\n");
+                                sb.append("MerchantID:");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getMerchantID());
+                                sb.append("\r\n");
+                                sb.append("CustomField:");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCustomField());
+                                sb.append("\r\n");
                                 sb.append("\r\n");
                                 sb.append("OrderInfo.MerchantTradeNo");
                                 sb.append("\r\n");
@@ -132,6 +142,22 @@ public class GatewaySDKPresenter {
                                 sb.append("OrderInfo.TradeNo");
                                 sb.append("\r\n");
                                 sb.append(callbackData.getOrderInfo().getTradeNo());
+                                sb.append("\r\n");
+                                sb.append("OrderInfo.TradeAmt");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getOrderInfo().getTradeAmt());
+                                sb.append("\r\n");
+                                sb.append("OrderInfo.PaymentType");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getOrderInfo().getPaymentType());
+                                sb.append("\r\n");
+                                sb.append("OrderInfo.ChargeFee");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getOrderInfo().getChargeFee());
+                                sb.append("\r\n");
+                                sb.append("OrderInfo.TradeStatus");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getOrderInfo().getTradeStatus());
 
                                 if(callbackData.getPaymentType() == PaymentType.CreditCard ||
                                         callbackData.getPaymentType() == PaymentType.CreditInstallment ||
@@ -198,6 +224,32 @@ public class GatewaySDKPresenter {
                                     sb.append("CardInfo.Staed");
                                     sb.append("\r\n");
                                     sb.append(callbackData.getCardInfo().getStaed());
+                                }
+                                if(callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount) {
+                                    sb.append("\r\n");
+                                    sb.append("CardInfo.PeriodType");
+                                    sb.append("\r\n");
+                                    sb.append(callbackData.getCardInfo().getPeriodType());
+                                    sb.append("\r\n");
+                                    sb.append("CardInfo.Frequency");
+                                    sb.append("\r\n");
+                                    sb.append(callbackData.getCardInfo().getFrequency());
+                                    sb.append("\r\n");
+                                    sb.append("CardInfo.ExecTimes");
+                                    sb.append("\r\n");
+                                    sb.append(callbackData.getCardInfo().getExecTimes());
+                                    sb.append("\r\n");
+                                    sb.append("CardInfo.PeriodAmount");
+                                    sb.append("\r\n");
+                                    sb.append(callbackData.getCardInfo().getPeriodAmount());
+                                    sb.append("\r\n");
+                                    sb.append("CardInfo.TotalSuccessTimes");
+                                    sb.append("\r\n");
+                                    sb.append(callbackData.getCardInfo().getTotalSuccessTimes());
+                                    sb.append("\r\n");
+                                    sb.append("CardInfo.TotalSuccessAmount");
+                                    sb.append("\r\n");
+                                    sb.append(callbackData.getCardInfo().getTotalSuccessAmount());
                                 }
 
                                 if(callbackData.getPaymentType() == PaymentType.ATM) {
@@ -487,7 +539,8 @@ public class GatewaySDKPresenter {
                     totalAmount,
                     "M",
                     3,
-                    5);
+                    5,
+                    "https://www.ecpay.com.tw/");
         } else if(paymentUIType == 1) {
             // 國旅卡
             cardInfo = new CardInfo(

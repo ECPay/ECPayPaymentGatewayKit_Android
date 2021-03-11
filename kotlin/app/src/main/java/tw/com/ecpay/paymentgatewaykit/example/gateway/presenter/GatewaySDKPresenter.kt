@@ -6,12 +6,6 @@ import android.content.Intent
 import android.text.TextUtils
 import android.util.Base64
 import com.google.gson.Gson
-import java.net.URLDecoder
-import java.text.SimpleDateFormat
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,6 +34,12 @@ import tw.com.ecpay.paymentgatewaykit.manager.LanguageCode
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentType
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentkitManager
 import tw.com.ecpay.paymentgatewaykit.manager.ServerType
+import java.net.URLDecoder
+import java.text.SimpleDateFormat
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import kotlin.coroutines.EmptyCoroutineContext
 
 class GatewaySDKPresenter {
 
@@ -118,20 +118,49 @@ class GatewaySDKPresenter {
                             val sb = StringBuffer()
                             sb.append("PaymentType:")
                             sb.append("\r\n")
-                            sb.append(getPaymentTypeName(callbackData.getPaymentType()))
+                            sb.append(getPaymentTypeName(callbackData.paymentType))
+                            sb.append("\r\n")
+                            sb.append("PlatformID:")
+                            sb.append("\r\n")
+                            sb.append(callbackData.platformID)
+                            sb.append("\r\n")
+                            sb.append("MerchantID:")
+                            sb.append("\r\n")
+                            sb.append(callbackData.merchantID)
+                            sb.append("\r\n")
+                            sb.append("CustomField:")
+                            sb.append("\r\n")
+                            sb.append(callbackData.customField)
                             sb.append("\r\n")
                             sb.append("\r\n")
                             sb.append("OrderInfo.MerchantTradeNo")
                             sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().getMerchantTradeNo())
+                            sb.append(callbackData.getOrderInfo().merchantTradeNo)
                             sb.append("\r\n")
                             sb.append("OrderInfo.TradeDate")
                             sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().getTradeDate())
+                            sb.append(callbackData.getOrderInfo().tradeDate)
                             sb.append("\r\n")
                             sb.append("OrderInfo.TradeNo")
                             sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().getTradeNo())
+                            sb.append(callbackData.getOrderInfo().tradeNo)
+                            sb.append("\r\n")
+                            sb.append("OrderInfo.TradeAmt")
+                            sb.append("\r\n")
+                            sb.append(callbackData.getOrderInfo().tradeAmt)
+                            sb.append("\r\n")
+                            sb.append("OrderInfo.PaymentType")
+                            sb.append("\r\n")
+                            sb.append(callbackData.getOrderInfo().paymentType)
+                            sb.append("\r\n")
+                            sb.append("OrderInfo.ChargeFee")
+                            sb.append("\r\n")
+                            sb.append(callbackData.getOrderInfo().chargeFee)
+                            sb.append("\r\n")
+                            sb.append("OrderInfo.TradeStatus")
+                            sb.append("\r\n")
+                            sb.append(callbackData.getOrderInfo().tradeStatus)
+
                             if (callbackData.getPaymentType() == PaymentType.CreditCard ||
                                 callbackData.getPaymentType() == PaymentType.CreditInstallment ||
                                 callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount ||
@@ -141,112 +170,139 @@ class GatewaySDKPresenter {
                                 sb.append("\r\n")
                                 sb.append("CardInfo.AuthCode")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getAuthCode())
+                                sb.append(callbackData.getCardInfo().authCode)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Gwsr")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getGwsr())
+                                sb.append(callbackData.getCardInfo().gwsr)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.ProcessDate")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getProcessDate())
+                                sb.append(callbackData.getCardInfo().processDate)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Amount")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getAmount())
+                                sb.append(callbackData.getCardInfo().amount)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Eci")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getEci())
+                                sb.append(callbackData.getCardInfo().eci)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Card6No")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getCard6No())
+                                sb.append(callbackData.getCardInfo().card6No)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Card4No")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getCard4No())
+                                sb.append(callbackData.getCardInfo().card4No)
                             }
                             if (callbackData.getPaymentType() == PaymentType.CreditCard) {
                                 sb.append("\r\n")
                                 sb.append("CardInfo.RedDan")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getRedDan())
+                                sb.append(callbackData.getCardInfo().redDan)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.RedDeAmt")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getRedDeAmt())
+                                sb.append(callbackData.getCardInfo().redDeAmt)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.RedOkAmt")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getRedOkAmt())
+                                sb.append(callbackData.getCardInfo().redOkAmt)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.RedYet")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getRedYet())
+                                sb.append(callbackData.getCardInfo().redYet)
                             }
                             if (callbackData.getPaymentType() == PaymentType.CreditInstallment) {
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Stage")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getStage())
+                                sb.append(callbackData.getCardInfo().stage)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Stast")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getStast())
+                                sb.append(callbackData.getCardInfo().stast)
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Staed")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().getStaed())
+                                sb.append(callbackData.getCardInfo().staed)
                             }
+                            if(callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount) {
+                                sb.append("\r\n")
+                                sb.append("CardInfo.PeriodType")
+                                sb.append("\r\n")
+                                sb.append(callbackData.getCardInfo().periodType)
+                                sb.append("\r\n")
+                                sb.append("CardInfo.Frequency")
+                                sb.append("\r\n")
+                                sb.append(callbackData.getCardInfo().frequency)
+                                sb.append("\r\n")
+                                sb.append("CardInfo.ExecTimes")
+                                sb.append("\r\n")
+                                sb.append(callbackData.getCardInfo().execTimes)
+                                sb.append("\r\n")
+                                sb.append("CardInfo.PeriodAmount")
+                                sb.append("\r\n")
+                                sb.append(callbackData.getCardInfo().periodAmount)
+                                sb.append("\r\n")
+                                sb.append("CardInfo.TotalSuccessTimes")
+                                sb.append("\r\n")
+                                sb.append(callbackData.getCardInfo().totalSuccessTimes)
+                                sb.append("\r\n")
+                                sb.append("CardInfo.TotalSuccessAmount")
+                                sb.append("\r\n")
+                                sb.append(callbackData.getCardInfo().totalSuccessAmount)
+                            }
+
                             if (callbackData.getPaymentType() == PaymentType.ATM) {
                                 sb.append("\r\n")
                                 sb.append("\r\n")
                                 sb.append("ATMInfo.BankCode")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getAtmInfo().getBankCode())
+                                sb.append(callbackData.getAtmInfo().bankCode)
                                 sb.append("\r\n")
                                 sb.append("ATMInfo.vAccount")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getAtmInfo().getvAccount())
+                                sb.append(callbackData.getAtmInfo().vAccount)
                                 sb.append("\r\n")
                                 sb.append("ATMInfo.ExpireDate")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getAtmInfo().getExpireDate())
+                                sb.append(callbackData.getAtmInfo().expireDate)
                             }
                             if (callbackData.getPaymentType() == PaymentType.CVS) {
                                 sb.append("\r\n")
                                 sb.append("\r\n")
                                 sb.append("CVSInfo.PaymentNo")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCvsInfo().getPaymentNo())
+                                sb.append(callbackData.getCvsInfo().paymentNo)
                                 sb.append("\r\n")
                                 sb.append("CVSInfo.ExpireDate")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCvsInfo().getExpireDate())
+                                sb.append(callbackData.getCvsInfo().expireDate)
                                 sb.append("\r\n")
                                 sb.append("CVSInfo.PaymentURL")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getCvsInfo().getPaymentURL())
+                                sb.append(callbackData.getCvsInfo().paymentURL)
                             }
                             if (callbackData.getPaymentType() == PaymentType.Barcode) {
                                 sb.append("\r\n")
                                 sb.append("\r\n")
                                 sb.append("BarcodeInfo.ExpireDate")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getBarcodeInfo().getExpireDate())
+                                sb.append(callbackData.getBarcodeInfo().expireDate)
                                 sb.append("\r\n")
                                 sb.append("BarcodeInfo.Barcode1")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getBarcodeInfo().getBarcode1())
+                                sb.append(callbackData.getBarcodeInfo().barcode1)
                                 sb.append("\r\n")
                                 sb.append("BarcodeInfo.Barcode2")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getBarcodeInfo().getBarcode2())
+                                sb.append(callbackData.getBarcodeInfo().barcode2)
                                 sb.append("\r\n")
                                 sb.append("BarcodeInfo.Barcode3")
                                 sb.append("\r\n")
-                                sb.append(callbackData.getBarcodeInfo().getBarcode3())
+                                sb.append(callbackData.getBarcodeInfo().barcode3)
                             }
                             UIUtil.showAlertDialog(
                                 mActivity,
@@ -293,8 +349,10 @@ class GatewaySDKPresenter {
     }
 
     fun onSamsungPay() {
-        PaymentkitManager.onSamsungPay(mActivity, mFragment,
-            PaymentkitManager.RequestCode_SamsungPay)
+        PaymentkitManager.onSamsungPay(
+            mActivity, mFragment,
+            PaymentkitManager.RequestCode_SamsungPay
+        )
     }
 
     fun getPaymentTypeName(paymentType: PaymentType): String {
@@ -463,8 +521,6 @@ class GatewaySDKPresenter {
         val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
 
         // 交易金額
-
-        // 交易金額
         val totalAmount = 200
 
         val orderInfo = OrderInfo(
@@ -477,51 +533,36 @@ class GatewaySDKPresenter {
         )
 
         var cardInfo: CardInfo? = null
-        if (paymentUIType === 0) {
-            // 信用卡定期定額
-            cardInfo = CardInfo(
-                null,
-                "https://www.ecpay.com.tw/",
-                totalAmount,
-                "M",
-                3,
-                5,
-                null,
-                null,
-                null,
-                null,
-                null
-            )
-        } else if (paymentUIType === 1) {
-            // 國旅卡
-            cardInfo = CardInfo(
-                "0",
-                "https://www.ecpay.com.tw/",
-                0,
-                null,
-                0,
-                0,
-                null,
-                null,
-                "01012020",
-                "01012029",
-                "001"
-            )
-        } else if (paymentUIType === 2) {
-            // 付款選擇清單頁
-            cardInfo = CardInfo(
-                "0",
-                "https://www.ecpay.com.tw/",
-                0,
-                null,
-                0,
-                0,
-                null,
-                "3,6",
-                null,
-                null,
-                null
-            )
+        when(paymentUIType) {
+            0 -> {
+                // 信用卡定期定額
+                cardInfo = CardInfo(
+                    "https://www.ecpay.com.tw/",
+                    totalAmount,
+                    "M",
+                    3,
+                    5,
+                    "https://www.ecpay.com.tw/"
+                )
+            }
+            1 -> {
+                // 國旅卡
+                cardInfo = CardInfo(
+                    "0",
+                    "https://www.ecpay.com.tw/",
+                    "01012020",
+                    "01012029",
+                    "001"
+                )
+            }
+            2 -> {
+                // 付款選擇清單頁
+                cardInfo = CardInfo(
+                    "0",
+                    "https://www.ecpay.com.tw/",
+                    "3,6"
+                )
+            }
         }
 
         val atmInfo = ATMInfo(

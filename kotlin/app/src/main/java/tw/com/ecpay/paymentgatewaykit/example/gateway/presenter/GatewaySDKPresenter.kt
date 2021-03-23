@@ -528,8 +528,8 @@ class GatewaySDKPresenter {
             System.currentTimeMillis().toString(),
             totalAmount,
             "https://www.ecpay.com.tw/",
-            "",
-            ""
+            "交易測試",
+            "測試商品"
         )
 
         var cardInfo: CardInfo? = null

@@ -528,8 +528,8 @@ public class GatewaySDKPresenter {
                 String.valueOf(System.currentTimeMillis()),
                 totalAmount,
                 "https://www.ecpay.com.tw/" ,
-                "",
-                "");
+                "交易測試",
+                "測試商品");
 
         CardInfo cardInfo = null;
         if(paymentUIType == 0) {

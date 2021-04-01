@@ -2,7 +2,7 @@
 ## https://member.ecpay.com.tw/MemberReg/MerchantRegister
 
 # 站內付2.0_Android版
-[ ![Download](https://api.bintray.com/packages/ecpay/paymentgatewaykit-android/ECPayPaymentGatewayKit/images/download.svg) ](https://bintray.com/ecpay/paymentgatewaykit-android/ECPayPaymentGatewayKit/_latestVersion)
+[![Maven Central](https://img.shields.io/maven-central/v/tw.com.ecpay/ECPayPaymentGatewayKit.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22tw.com.ecpay%22%20AND%20a:%22ECPayPaymentGatewayKit%22)
 
 
 ## About
@@ -16,20 +16,27 @@
 
 ##  Installation
 
-ECPay Payment SDK公開於[JCenter](https://bintray.com/bintray/jcenter)來源庫<br/>
+ECPay Payment SDK公開於[Maven Central](https://search.maven.org/)來源庫<br/>
 使用SDK需在````app/build.gradle````檔案新增dependency
+
 ````gradle
 dependencies {
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay.paymentgatewaykit:ECPayPaymentGatewayKit:1.0.3'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.0.3'
 }
 ````
-請於````project/build.gradle````檔案加入[JCenter](https://bintray.com/bintray/jcenter)
+請於````project/build.gradle````檔案加入[Maven Central](https://search.maven.org/)
 
 ````gradle
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
+        jcenter {
+            content {
+                //  org.jetbrains.trove4j is only available in JCenter
+                includeGroup("org.jetbrains.trove4j")
+            }
+        }
     }
 }
 ````

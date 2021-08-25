@@ -17,7 +17,17 @@
 ##  Installation
 
 ECPay Payment SDK公開於[Maven Central](https://search.maven.org/)來源庫<br/>
-使用SDK需在````app/build.gradle````檔案新增dependency
+
+請於````app/build.gradle````檔案加上dataBinding設定
+
+````gradle
+android {
+    dataBinding {
+        enabled = true
+    }
+}
+````
+````app/build.gradle````檔案新增dependency
 
 ````gradle
 dependencies {
@@ -25,7 +35,7 @@ dependencies {
     implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.0.3'
 }
 ````
-請於````project/build.gradle````檔案加入[Maven Central](https://search.maven.org/)
+````project/build.gradle````檔案加入[Maven Central](https://search.maven.org/)
 
 ````gradle
 buildscript {

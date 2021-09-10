@@ -32,7 +32,7 @@ android {
 ````gradle
 dependencies {
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.0.3'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.0.4'
 }
 ````
 ````project/build.gradle````檔案加入[Maven Central](https://search.maven.org/)

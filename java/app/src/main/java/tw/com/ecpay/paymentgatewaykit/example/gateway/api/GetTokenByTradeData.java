@@ -12,6 +12,7 @@ public class GetTokenByTradeData {
     public CVSInfo CVSInfo;
     public BarcodeInfo BarcodeInfo;
     public ConsumerInfo ConsumerInfo;
+    public UnionPayInfo UnionPayInfo;
     public GetTokenByTradeData(String PlatformID,
                                String MerchantID,
                                int RememberCard,
@@ -22,7 +23,8 @@ public class GetTokenByTradeData {
                                ATMInfo ATMInfo,
                                CVSInfo CVSInfo,
                                BarcodeInfo BarcodeInfo,
-                               ConsumerInfo ConsumerInfo) {
+                               ConsumerInfo ConsumerInfo,
+                               UnionPayInfo UnionPayInfo) {
         this.PlatformID = PlatformID;
         this.MerchantID = MerchantID;
         this.RememberCard = RememberCard;
@@ -34,5 +36,6 @@ public class GetTokenByTradeData {
         this.CVSInfo = CVSInfo;
         this.BarcodeInfo = BarcodeInfo;
         this.ConsumerInfo = ConsumerInfo;
+        this.UnionPayInfo = UnionPayInfo;
     }
 }

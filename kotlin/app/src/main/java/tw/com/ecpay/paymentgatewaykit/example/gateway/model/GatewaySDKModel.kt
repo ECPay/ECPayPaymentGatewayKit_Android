@@ -21,8 +21,7 @@ class GatewaySDKModel {
 
     val threeDSwitch = ObservableField<Boolean>()
 
-    fun GatewaySDKModel() {
-    }
+    val redeemSwitch = ObservableField<Boolean>()
 
     fun init() {
         getTokenType.set(R.id.getTokenType1)

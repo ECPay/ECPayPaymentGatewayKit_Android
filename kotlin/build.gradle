@@ -39,10 +39,10 @@ ext {
     versionNumber = "1"
     versionName = "1.0.0"
 
-    compileSdkVersion = 29
-    buildToolsVersion = "29.0.2"
+    compileSdkVersion = 30
+    buildToolsVersion = "30.0.2"
     minSdkVersion = "21"
-    targetSdkVersion = "29"
+    targetSdkVersion = "30"
 
     //android x
     androidxAppcompatLibVersion = "1.1.0"

@@ -11,5 +11,6 @@ data class GetTokenByTradeData(
     var ATMInfo: ATMInfo?,
     var CVSInfo: CVSInfo?,
     var BarcodeInfo: BarcodeInfo?,
-    var ConsumerInfo: ConsumerInfo?
+    var ConsumerInfo: ConsumerInfo?,
+    var UnionPayInfo: UnionPayInfo?
 )

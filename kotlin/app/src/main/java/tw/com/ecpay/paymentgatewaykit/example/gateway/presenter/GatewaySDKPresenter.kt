@@ -19,6 +19,7 @@ import tw.com.ecpay.paymentgatewaykit.example.gateway.api.DecData
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.GetTokenByTradeData
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.GetTokenByUserData
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.OrderInfo
+import tw.com.ecpay.paymentgatewaykit.example.gateway.api.UnionPayInfo
 import tw.com.ecpay.paymentgatewaykit.example.gateway.fragment.GatewaySDKFragment
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.ExampleData
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.GatewaySDKModel
@@ -107,7 +108,7 @@ class GatewaySDKPresenter {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Utility.log("onActivityResult(), requestCode:$requestCode, resultCode:$resultCode")
-        if (requestCode === PaymentkitManager.RequestCode_CreatePayment) {
+        if (requestCode == PaymentkitManager.RequestCode_CreatePayment) {
             PaymentkitManager.createPaymentResult(
                 mActivity,
                 resultCode,
@@ -161,10 +162,13 @@ class GatewaySDKPresenter {
                             sb.append("\r\n")
                             sb.append(callbackData.getOrderInfo().tradeStatus)
 
-                            if (callbackData.getPaymentType() == PaymentType.CreditCard ||
-                                callbackData.getPaymentType() == PaymentType.CreditInstallment ||
-                                callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount ||
-                                callbackData.getPaymentType() == PaymentType.NationalTravelCard
+                            if (callbackData.getPaymentType() in arrayOf(
+                                    PaymentType.CreditCard,
+                                    PaymentType.CreditInstallment,
+                                    PaymentType.PeriodicFixedAmount,
+                                    PaymentType.NationalTravelCard,
+                                    PaymentType.UnionPay
+                                )
                             ) {
                                 sb.append("\r\n")
                                 sb.append("\r\n")
@@ -196,7 +200,11 @@ class GatewaySDKPresenter {
                                 sb.append("\r\n")
                                 sb.append(callbackData.getCardInfo().card4No)
                             }
-                            if (callbackData.getPaymentType() == PaymentType.CreditCard) {
+                            if (callbackData.getPaymentType() in arrayOf(
+                                    PaymentType.CreditCard,
+                                    PaymentType.UnionPay
+                                )
+                            ) {
                                 sb.append("\r\n")
                                 sb.append("CardInfo.RedDan")
                                 sb.append("\r\n")
@@ -364,6 +372,7 @@ class GatewaySDKPresenter {
             PaymentType.Barcode -> "超商條碼"
             PaymentType.PeriodicFixedAmount -> "信用卡定期定額"
             PaymentType.NationalTravelCard -> "國旅卡"
+            PaymentType.UnionPay -> "銀聯卡"
             else -> ""
         }
     }
@@ -522,6 +531,8 @@ class GatewaySDKPresenter {
 
         // 交易金額
         val totalAmount = 200
+        // 信用卡紅利折抵
+        val redeem = if (mModel.redeemSwitch.get() != null && mModel.redeemSwitch.get()!!) "1" else "0"
 
         val orderInfo = OrderInfo(
             dateFormat.format(System.currentTimeMillis()),
@@ -533,6 +544,7 @@ class GatewaySDKPresenter {
         )
 
         var cardInfo: CardInfo? = null
+        var unionPayInfo: UnionPayInfo? = null
         when(paymentUIType) {
             0 -> {
                 // 信用卡定期定額
@@ -548,7 +560,7 @@ class GatewaySDKPresenter {
             1 -> {
                 // 國旅卡
                 cardInfo = CardInfo(
-                    "0",
+                    redeem,
                     "https://www.ecpay.com.tw/",
                     "01012020",
                     "01012029",
@@ -558,12 +570,16 @@ class GatewaySDKPresenter {
             2 -> {
                 // 付款選擇清單頁
                 cardInfo = CardInfo(
-                    "0",
+                    redeem,
                     "https://www.ecpay.com.tw/",
                     "3,6"
                 )
             }
         }
+
+        unionPayInfo = UnionPayInfo(
+            "https://www.ecpay.com.tw/"
+        )
 
         val atmInfo = ATMInfo(
             5
@@ -601,7 +617,8 @@ class GatewaySDKPresenter {
             atmInfo,
             cvsInfo,
             barcodeInfo,
-            consumerInfo
+            consumerInfo,
+            unionPayInfo
         )
 
         val data = Gson().toJson(getTokenByTradeData)

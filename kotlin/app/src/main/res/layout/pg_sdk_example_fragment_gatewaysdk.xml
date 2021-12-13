@@ -103,6 +103,13 @@
                 android:onClick="@{(view) -> mPresenter.onThreeDSwitch()}"
                 android:text="是否3D驗證" />
 
+            <Switch
+                android:id="@+id/redeemSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="@={mModel.redeemSwitch}"
+                android:text="是否開啟信用卡紅利折抵" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -28,6 +28,7 @@ import tw.com.ecpay.paymentgatewaykit.example.gateway.api.DecData;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.GetTokenByTradeData;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.GetTokenByUserData;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.OrderInfo;
+import tw.com.ecpay.paymentgatewaykit.example.gateway.api.UnionPayInfo;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.fragment.GatewaySDKFragment;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.GatewaySDKModel;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.ExampleData;
@@ -162,7 +163,8 @@ public class GatewaySDKPresenter {
                                 if(callbackData.getPaymentType() == PaymentType.CreditCard ||
                                         callbackData.getPaymentType() == PaymentType.CreditInstallment ||
                                         callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount ||
-                                        callbackData.getPaymentType() == PaymentType.NationalTravelCard) {
+                                        callbackData.getPaymentType() == PaymentType.NationalTravelCard ||
+                                        callbackData.getPaymentType() == PaymentType.UnionPay) {
                                     sb.append("\r\n");
                                     sb.append("\r\n");
                                     sb.append("CardInfo.AuthCode");
@@ -193,7 +195,8 @@ public class GatewaySDKPresenter {
                                     sb.append("\r\n");
                                     sb.append(callbackData.getCardInfo().getCard4No());
                                 }
-                                if(callbackData.getPaymentType() == PaymentType.CreditCard) {
+                                if(callbackData.getPaymentType() == PaymentType.CreditCard ||
+                                        callbackData.getPaymentType() == PaymentType.UnionPay) {
                                     sb.append("\r\n");
                                     sb.append("CardInfo.RedDan");
                                     sb.append("\r\n");
@@ -367,6 +370,8 @@ public class GatewaySDKPresenter {
                 return "信用卡定期定額";
             case NationalTravelCard:
                 return "國旅卡";
+            case UnionPay:
+                return "銀聯卡";
             default:
                 return "";
         }
@@ -522,6 +527,8 @@ public class GatewaySDKPresenter {
 
         // 交易金額
         int totalAmount = 200;
+        // 信用卡紅利折抵
+        String redeem = (mModel.redeemSwitch.get()!=null && mModel.redeemSwitch.get())? "1" : "0";
 
         OrderInfo orderInfo = new OrderInfo(
                 dateFormat.format(System.currentTimeMillis()),
@@ -532,6 +539,7 @@ public class GatewaySDKPresenter {
                 "測試商品");
 
         CardInfo cardInfo = null;
+        UnionPayInfo unionPayInfo = null;
         if(paymentUIType == 0) {
             // 信用卡定期定額
             cardInfo = new CardInfo(
@@ -544,7 +552,7 @@ public class GatewaySDKPresenter {
         } else if(paymentUIType == 1) {
             // 國旅卡
             cardInfo = new CardInfo(
-                    "0",
+                    redeem,
                     "https://www.ecpay.com.tw/",
                     "01012020",
                     "01012029",
@@ -552,10 +560,11 @@ public class GatewaySDKPresenter {
         } else if(paymentUIType == 2) {
             // 付款選擇清單頁
             cardInfo = new CardInfo(
-                    "0",
+                    redeem,
                     "https://www.ecpay.com.tw/",
                     "3,6");
         }
+        unionPayInfo = new UnionPayInfo("https://www.ecpay.com.tw/");
 
         ATMInfo atmInfo = new ATMInfo(
                 5);
@@ -589,7 +598,8 @@ public class GatewaySDKPresenter {
                 atmInfo,
                 cvsInfo,
                 barcodeInfo,
-                consumerInfo);
+                consumerInfo,
+                unionPayInfo);
 
         String data = new Gson().toJson(getTokenByTradeData);
 

@@ -341,6 +341,14 @@ public class GatewaySDKPresenter {
                                 }
                             }, "確定");
                             break;
+                        case Exit:
+                            UIUtil.showAlertDialog(mActivity, "提醒您", "離開", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            }, "確定");
+                            break;
                     }
                 }
             });

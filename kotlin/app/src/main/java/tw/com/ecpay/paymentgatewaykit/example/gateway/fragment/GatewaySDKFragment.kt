@@ -17,7 +17,7 @@ class GatewaySDKFragment : Fragment() {
 
     companion object {
 
-        public val FragmentTagName = GatewaySDKFragment::class.java.name
+        val FragmentTagName = GatewaySDKFragment::class.java.name
 
         fun newInstance(): GatewaySDKFragment {
             return GatewaySDKFragment()
@@ -48,7 +48,7 @@ class GatewaySDKFragment : Fragment() {
         binding.mModel = mModel
         binding.mPresenter = mPresenter
 
-        val view = binding.getRoot()
+        val view = binding.root
 
         mPresenter.init()
 
@@ -75,5 +75,4 @@ class GatewaySDKFragment : Fragment() {
     fun hideSamsungPayLayout() {
         binding.samsungPayLayout.visibility = View.GONE
     }
-
 }

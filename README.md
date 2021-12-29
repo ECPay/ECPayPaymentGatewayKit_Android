@@ -38,7 +38,7 @@ android {
 ````gradle
 dependencies {
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.1.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.1.1'
 }
 ````
 ````project/build.gradle````檔案加入[Maven Central](https://search.maven.org/)
@@ -323,6 +323,14 @@ public void onActivityResult(int requestCode, int resultCode, Intent data) {
                             }
                         }, "確定");
                         break;
+                    case Exit:
+                        UIUtil.showAlertDialog(mActivity, "提醒您", "離開", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }, "確定");
+                        break;
                 }
             }
         });
@@ -337,6 +345,7 @@ callback 包含以下狀態
 * Fail：執行失敗
 * Success：執行成功
 * Cancel：取消
+* Exit：離開
 * Unknown：未知
 ````
 

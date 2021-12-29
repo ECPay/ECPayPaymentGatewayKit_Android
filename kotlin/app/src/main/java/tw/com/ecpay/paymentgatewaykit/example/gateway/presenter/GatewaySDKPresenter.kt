@@ -42,30 +42,13 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.coroutines.EmptyCoroutineContext
 
-class GatewaySDKPresenter {
-
-    private var mActivity: Activity
-
-    private var mFragment: GatewaySDKFragment
-
-    private var mModel: GatewaySDKModel
-
-    private var mExampleData: ExampleData
-
-    private val coroutineScope: CoroutineScope
-
-    constructor (
-        mActivity: Activity,
-        mFragment: GatewaySDKFragment,
-        mModel: GatewaySDKModel,
-        mExampleData: ExampleData
-    ) {
-        this.mActivity = mActivity
-        this.mFragment = mFragment
-        this.mModel = mModel
-        this.mExampleData = mExampleData
-        this.coroutineScope = CoroutineScope(EmptyCoroutineContext)
-    }
+class GatewaySDKPresenter(
+    private var mActivity: Activity,
+    private var mFragment: GatewaySDKFragment,
+    private var mModel: GatewaySDKModel,
+    private var mExampleData: ExampleData,
+    private val coroutineScope: CoroutineScope = CoroutineScope(EmptyCoroutineContext)
+) {
 
     fun init() {
         val serverType = ServerType.Stage
@@ -346,6 +329,13 @@ class GatewaySDKPresenter {
                             mActivity,
                             "提醒您",
                             "交易取消",
+                            DialogInterface.OnClickListener { dialog, which -> },
+                            "確定"
+                        )
+                        CallbackStatus.Exit -> UIUtil.showAlertDialog(
+                            mActivity,
+                            "提醒您",
+                            "離開",
                             DialogInterface.OnClickListener { dialog, which -> },
                             "確定"
                         )

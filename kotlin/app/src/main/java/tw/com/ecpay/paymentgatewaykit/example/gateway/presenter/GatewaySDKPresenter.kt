@@ -183,11 +183,7 @@ class GatewaySDKPresenter(
                                 sb.append("\r\n")
                                 sb.append(callbackData.getCardInfo().card4No)
                             }
-                            if (callbackData.getPaymentType() in arrayOf(
-                                    PaymentType.CreditCard,
-                                    PaymentType.UnionPay
-                                )
-                            ) {
+                            if (callbackData.getPaymentType() == PaymentType.CreditCard) {
                                 sb.append("\r\n")
                                 sb.append("CardInfo.RedDan")
                                 sb.append("\r\n")

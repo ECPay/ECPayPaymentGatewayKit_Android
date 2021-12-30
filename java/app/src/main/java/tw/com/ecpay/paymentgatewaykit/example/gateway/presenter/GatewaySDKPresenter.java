@@ -195,8 +195,7 @@ public class GatewaySDKPresenter {
                                     sb.append("\r\n");
                                     sb.append(callbackData.getCardInfo().getCard4No());
                                 }
-                                if(callbackData.getPaymentType() == PaymentType.CreditCard ||
-                                        callbackData.getPaymentType() == PaymentType.UnionPay) {
+                                if(callbackData.getPaymentType() == PaymentType.CreditCard) {
                                     sb.append("\r\n");
                                     sb.append("CardInfo.RedDan");
                                     sb.append("\r\n");

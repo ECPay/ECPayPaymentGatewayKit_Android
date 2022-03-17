@@ -47,12 +47,6 @@ dependencies {
 buildscript {
     repositories {
         mavenCentral()
-        jcenter {
-            content {
-                //  org.jetbrains.trove4j is only available in JCenter
-                includeGroup("org.jetbrains.trove4j")
-            }
-        }
     }
 }
 ````

@@ -85,6 +85,13 @@ dependencies {
 
     implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.1.1'
 
+    if (JavaVersion.current().ordinal() >= JavaVersion.VERSION_1_9.ordinal()) {
+        annotationProcessor 'javax.xml.bind:jaxb-api:2.3.1'
+        annotationProcessor 'com.sun.xml.bind:jaxb-core:3.0.2'
+        annotationProcessor 'com.sun.xml.bind:jaxb-impl:2.3.6'
+        annotationProcessor 'javax.activation:activation:1.1.1'
+    }
+
     testImplementation 'junit:junit:4.12'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

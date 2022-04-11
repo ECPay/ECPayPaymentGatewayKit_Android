@@ -110,6 +110,13 @@
                 android:checked="@={mModel.redeemSwitch}"
                 android:text="是否開啟信用卡紅利折抵" />
 
+            <Switch
+                android:id="@+id/totalAmountSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="@={mModel.totalAmountSwitch}"
+                android:text="是否大額訂單金額交易" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

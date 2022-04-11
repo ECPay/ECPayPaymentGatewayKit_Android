@@ -150,7 +150,8 @@ class GatewaySDKPresenter(
                                     PaymentType.CreditInstallment,
                                     PaymentType.PeriodicFixedAmount,
                                     PaymentType.NationalTravelCard,
-                                    PaymentType.UnionPay
+                                    PaymentType.UnionPay,
+                                    PaymentType.FlexibleInstallment
                                 )
                             ) {
                                 sb.append("\r\n")
@@ -201,7 +202,11 @@ class GatewaySDKPresenter(
                                 sb.append("\r\n")
                                 sb.append(callbackData.getCardInfo().redYet)
                             }
-                            if (callbackData.getPaymentType() == PaymentType.CreditInstallment) {
+                            if (callbackData.getPaymentType() in arrayOf(
+                                    PaymentType.CreditInstallment,
+                                    PaymentType.FlexibleInstallment
+                                )
+                            ) {
                                 sb.append("\r\n")
                                 sb.append("CardInfo.Stage")
                                 sb.append("\r\n")
@@ -215,7 +220,7 @@ class GatewaySDKPresenter(
                                 sb.append("\r\n")
                                 sb.append(callbackData.getCardInfo().staed)
                             }
-                            if(callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount) {
+                            if (callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount) {
                                 sb.append("\r\n")
                                 sb.append("CardInfo.PeriodType")
                                 sb.append("\r\n")
@@ -359,6 +364,7 @@ class GatewaySDKPresenter(
             PaymentType.PeriodicFixedAmount -> "信用卡定期定額"
             PaymentType.NationalTravelCard -> "國旅卡"
             PaymentType.UnionPay -> "銀聯卡"
+            PaymentType.FlexibleInstallment -> "信用卡圓夢分期"
             else -> ""
         }
     }
@@ -516,7 +522,7 @@ class GatewaySDKPresenter(
         val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
 
         // 交易金額
-        val totalAmount = 200
+        val totalAmount = if (mModel.totalAmountSwitch.get() != null && mModel.totalAmountSwitch.get()!!) 20000 else 200
         // 信用卡紅利折抵
         val redeem = if (mModel.redeemSwitch.get() != null && mModel.redeemSwitch.get()!!) "1" else "0"
 
@@ -558,7 +564,8 @@ class GatewaySDKPresenter(
                 cardInfo = CardInfo(
                     redeem,
                     "https://www.ecpay.com.tw/",
-                    "3,6"
+                    "3,6",
+                    "30"
                 )
             }
         }

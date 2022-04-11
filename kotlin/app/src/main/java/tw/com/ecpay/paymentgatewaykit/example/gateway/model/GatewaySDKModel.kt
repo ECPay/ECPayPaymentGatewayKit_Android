@@ -23,6 +23,8 @@ class GatewaySDKModel {
 
     val redeemSwitch = ObservableField<Boolean>()
 
+    val totalAmountSwitch = ObservableField<Boolean>()
+
     fun init() {
         getTokenType.set(R.id.getTokenType1)
     }

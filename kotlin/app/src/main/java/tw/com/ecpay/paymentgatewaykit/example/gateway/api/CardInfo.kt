@@ -15,6 +15,9 @@ data class CardInfo(
     // ----------------------------------------- 刷卡分期
     var CreditInstallment: String? = null
 
+    //----------------------------------------- 圓夢彈性分期
+    var FlexibleInstallment: String? = null
+
     // ----------------------------------------- 國旅卡
     var TravelStartDate: String? = null
     var TravelEndDate: String? = null
@@ -23,12 +26,14 @@ data class CardInfo(
     constructor (
         Redeem: String,
         OrderResultURL: String,
-        CreditInstallment: String
+        CreditInstallment: String,
+        FlexibleInstallment: String
     ) : this(
         OrderResultURL
     ) {
         this.Redeem = Redeem
         this.CreditInstallment = CreditInstallment
+        this.FlexibleInstallment = FlexibleInstallment
     }
 
     constructor (

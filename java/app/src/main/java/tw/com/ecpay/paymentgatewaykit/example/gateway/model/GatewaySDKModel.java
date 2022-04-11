@@ -24,6 +24,8 @@ public class GatewaySDKModel {
 
     public final ObservableField<Boolean> redeemSwitch = new ObservableField<>();
 
+    public final ObservableField<Boolean> totalAmountSwitch = new ObservableField<>();
+
     public GatewaySDKModel() {
         getTokenType.set(R.id.getTokenType1);
     }

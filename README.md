@@ -38,7 +38,7 @@ android {
 ````gradle
 dependencies {
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.1.1'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.2.0'
 }
 ````
 ````project/build.gradle````檔案加入[Maven Central](https://search.maven.org/)
@@ -140,7 +140,8 @@ public void onActivityResult(int requestCode, int resultCode, Intent data) {
                                     callbackData.getPaymentType() == PaymentType.CreditInstallment ||
                                     callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount ||
                                     callbackData.getPaymentType() == PaymentType.NationalTravelCard ||
-                                    callbackData.getPaymentType() == PaymentType.UnionPay) {
+                                    callbackData.getPaymentType() == PaymentType.UnionPay ||
+                                    callbackData.getPaymentType() == PaymentType.FlexibleInstallment) {
                                 sb.append("\r\n");
                                 sb.append("\r\n");
                                 sb.append("CardInfo.AuthCode");
@@ -189,7 +190,8 @@ public void onActivityResult(int requestCode, int resultCode, Intent data) {
                                 sb.append("\r\n");
                                 sb.append(callbackData.getCardInfo().getRedYet());
                             }
-                            if(callbackData.getPaymentType() == PaymentType.CreditInstallment) {
+                            if(callbackData.getPaymentType() == PaymentType.CreditInstallment ||
+                                    callbackData.getPaymentType() == PaymentType.FlexibleInstallment) {
                                 sb.append("\r\n");
                                 sb.append("CardInfo.Stage");
                                 sb.append("\r\n");

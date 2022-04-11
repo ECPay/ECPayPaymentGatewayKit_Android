@@ -164,7 +164,8 @@ public class GatewaySDKPresenter {
                                         callbackData.getPaymentType() == PaymentType.CreditInstallment ||
                                         callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount ||
                                         callbackData.getPaymentType() == PaymentType.NationalTravelCard ||
-                                        callbackData.getPaymentType() == PaymentType.UnionPay) {
+                                        callbackData.getPaymentType() == PaymentType.UnionPay ||
+                                        callbackData.getPaymentType() == PaymentType.FlexibleInstallment) {
                                     sb.append("\r\n");
                                     sb.append("\r\n");
                                     sb.append("CardInfo.AuthCode");
@@ -213,7 +214,8 @@ public class GatewaySDKPresenter {
                                     sb.append("\r\n");
                                     sb.append(callbackData.getCardInfo().getRedYet());
                                 }
-                                if(callbackData.getPaymentType() == PaymentType.CreditInstallment) {
+                                if(callbackData.getPaymentType() == PaymentType.CreditInstallment ||
+                                        callbackData.getPaymentType() == PaymentType.FlexibleInstallment) {
                                     sb.append("\r\n");
                                     sb.append("CardInfo.Stage");
                                     sb.append("\r\n");
@@ -379,6 +381,8 @@ public class GatewaySDKPresenter {
                 return "國旅卡";
             case UnionPay:
                 return "銀聯卡";
+            case FlexibleInstallment:
+                return "信用卡圓夢分期";
             default:
                 return "";
         }
@@ -533,7 +537,7 @@ public class GatewaySDKPresenter {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
         // 交易金額
-        int totalAmount = 200;
+        int totalAmount = (mModel.totalAmountSwitch.get()!=null && mModel.totalAmountSwitch.get())? 20000 : 200;
         // 信用卡紅利折抵
         String redeem = (mModel.redeemSwitch.get()!=null && mModel.redeemSwitch.get())? "1" : "0";
 
@@ -569,7 +573,8 @@ public class GatewaySDKPresenter {
             cardInfo = new CardInfo(
                     redeem,
                     "https://www.ecpay.com.tw/",
-                    "3,6");
+                    "3,6",
+                    "30");
         }
         unionPayInfo = new UnionPayInfo("https://www.ecpay.com.tw/");
 

@@ -53,6 +53,14 @@ public class CardInfo {
      */
     public String CreditInstallment;
 
+    //----------------------------------------- 圓夢彈性分期
+
+    /**
+     * 圓夢彈性分期期數.
+     * <br> 30
+     */
+    public String FlexibleInstallment;
+
     //----------------------------------------- 國旅卡
     /**
      * 國旅卡旅遊起日.
@@ -70,10 +78,13 @@ public class CardInfo {
     public String TravelCounty;
 
     public CardInfo(String Redeem,
-                    String OrderResultURL, String CreditInstallment) {
+                    String OrderResultURL,
+                    String CreditInstallment,
+                    String FlexibleInstallment) {
         this.Redeem = Redeem;
         this.OrderResultURL = OrderResultURL;
         this.CreditInstallment = CreditInstallment;
+        this.FlexibleInstallment = FlexibleInstallment;
     }
 
     public CardInfo(String OrderResultURL,

@@ -75,7 +75,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.retrofit2LibVersion}"
     implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.retrofit2LibVersion}"
 
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.2.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.2.1'
 
     if (JavaVersion.current().ordinal() >= JavaVersion.VERSION_1_9.ordinal()) {
         annotationProcessor 'javax.xml.bind:jaxb-api:2.3.1'

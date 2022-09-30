@@ -37,18 +37,16 @@ android {
 
 ````gradle
 dependencies {
-    // ECPay Payment SDK
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.zxing:core:3.3.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.6.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.6.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
 
-    implementation "androidx.appcompat:appcompat:${rootProject.ext.androidxAppcompatLibVersion}"
-    implementation "com.google.android.material:material:${rootProject.ext.materialLibVersion}"
-    implementation "com.google.code.gson:gson:${rootProject.ext.gsonLibVersion}"
-    implementation "com.google.zxing:core:${rootProject.ext.zxingCoreLibVersion}"
-    implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3LibVersion}"
-    implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.okhttp3LibVersion}"
-    implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.retrofit2LibVersion}"
-    implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.retrofit2LibVersion}"
-
+	// ECPay Payment SDK
     implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.2.1'
 
     if (JavaVersion.current().ordinal() >= JavaVersion.VERSION_1_9.ordinal()) {

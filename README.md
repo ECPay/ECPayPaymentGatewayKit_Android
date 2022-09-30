@@ -46,7 +46,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
 
-	// ECPay Payment SDK
+    // ECPay Payment SDK
     implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.2.1'
 
     if (JavaVersion.current().ordinal() >= JavaVersion.VERSION_1_9.ordinal()) {

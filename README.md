@@ -38,8 +38,27 @@ android {
 ````gradle
 dependencies {
     // ECPay Payment SDK
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.androidxAppcompatLibVersion}"
+    implementation "com.google.android.material:material:${rootProject.ext.materialLibVersion}"
+    implementation "com.google.code.gson:gson:${rootProject.ext.gsonLibVersion}"
+    implementation "com.google.zxing:core:${rootProject.ext.zxingCoreLibVersion}"
+    implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3LibVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.okhttp3LibVersion}"
+    implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.retrofit2LibVersion}"
+    implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.retrofit2LibVersion}"
+
     implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.2.1'
+
+    if (JavaVersion.current().ordinal() >= JavaVersion.VERSION_1_9.ordinal()) {
+        annotationProcessor 'javax.xml.bind:jaxb-api:2.3.1'
+        annotationProcessor 'com.sun.xml.bind:jaxb-core:3.0.2'
+        annotationProcessor 'com.sun.xml.bind:jaxb-impl:2.3.6'
+        annotationProcessor 'javax.activation:activation:1.1.1'
+    }
 }
+
 ````
 ````project/build.gradle````檔案加入[Maven Central](https://search.maven.org/)
 

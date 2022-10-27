@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.frameLayout, GatewaySDKFragment.newInstance(),
                         GatewaySDKFragment.FragmentTagName)
                 .commit();
-
     }
 
     @Override
@@ -37,5 +36,4 @@ public class MainActivity extends AppCompatActivity {
             (fragment).onActivityResult(requestCode, resultCode, data);
         }
     }
-
 }

@@ -1,40 +1,32 @@
 package tw.com.ecpay.paymentgatewaykit.example.gateway.presenter
 
-import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.text.TextUtils
 import android.util.Base64
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import tw.com.ecpay.paymentgatewaykit.example.ActivityResultType
+import tw.com.ecpay.paymentgatewaykit.example.MainActivity
 import tw.com.ecpay.paymentgatewaykit.example.R
+import tw.com.ecpay.paymentgatewaykit.example.gateway.api.*
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.ATMInfo
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.BarcodeInfo
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.CVSInfo
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.CardInfo
-import tw.com.ecpay.paymentgatewaykit.example.gateway.api.ConsumerInfo
-import tw.com.ecpay.paymentgatewaykit.example.gateway.api.DecData
-import tw.com.ecpay.paymentgatewaykit.example.gateway.api.GetTokenByTradeData
-import tw.com.ecpay.paymentgatewaykit.example.gateway.api.GetTokenByUserData
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.OrderInfo
-import tw.com.ecpay.paymentgatewaykit.example.gateway.api.UnionPayInfo
 import tw.com.ecpay.paymentgatewaykit.example.gateway.fragment.GatewaySDKFragment
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.ExampleData
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.GatewaySDKModel
 import tw.com.ecpay.paymentgatewaykit.example.util.UIUtil
 import tw.com.ecpay.paymentgatewaykit.example.util.Utility
-import tw.com.ecpay.paymentgatewaykit.manager.CallbackFunction
-import tw.com.ecpay.paymentgatewaykit.manager.CallbackStatus
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfo
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfoCallbackData
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfo
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfoCallbackData
-import tw.com.ecpay.paymentgatewaykit.manager.LanguageCode
-import tw.com.ecpay.paymentgatewaykit.manager.PaymentType
-import tw.com.ecpay.paymentgatewaykit.manager.PaymentkitManager
-import tw.com.ecpay.paymentgatewaykit.manager.ServerType
+import tw.com.ecpay.paymentgatewaykit.manager.*
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import javax.crypto.Cipher
@@ -43,12 +35,35 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.coroutines.EmptyCoroutineContext
 
 class GatewaySDKPresenter(
-    private var mActivity: Activity,
+    private var mActivity: MainActivity,
     private var mFragment: GatewaySDKFragment,
     private var mModel: GatewaySDKModel,
     private var mExampleData: ExampleData,
     private val coroutineScope: CoroutineScope = CoroutineScope(EmptyCoroutineContext)
 ) {
+
+    lateinit var activityResultLauncherForFragment: ActivityResultLauncher<Intent>
+
+    lateinit var activityResultLauncherForActivity: ActivityResultLauncher<Intent>
+
+    init {
+        registerForActivityResult()
+    }
+
+    private fun registerForActivityResult() {
+        activityResultLauncherForFragment =
+            mFragment.registerForActivityResult(StartActivityForResult(),
+                ActivityResultCallback<ActivityResult> { result ->
+                    Utility.log("Fragment ActivityResultCallback.onActivityResult(), resultCode:" + result.resultCode)
+                    createPaymentResult(result.resultCode, result.data)
+                })
+        activityResultLauncherForActivity =
+            mActivity.registerForActivityResult(StartActivityForResult(),
+                ActivityResultCallback<ActivityResult> { result ->
+                    Utility.log("Activity ActivityResultCallback.onActivityResult(), resultCode:" + result.resultCode)
+                    createPaymentResult(result.resultCode, result.data)
+                })
+    }
 
     fun init() {
         val serverType = ServerType.Stage
@@ -92,259 +107,263 @@ class GatewaySDKPresenter(
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Utility.log("onActivityResult(), requestCode:$requestCode, resultCode:$resultCode")
         if (requestCode == PaymentkitManager.RequestCode_CreatePayment) {
-            PaymentkitManager.createPaymentResult(
-                mActivity,
-                resultCode,
-                data,
-                CallbackFunction { callbackData ->
-                    when (callbackData.getCallbackStatus()) {
-                        CallbackStatus.Success -> if (callbackData.getRtnCode() == 1) {
-                            val sb = StringBuffer()
-                            sb.append("PaymentType:")
-                            sb.append("\r\n")
-                            sb.append(getPaymentTypeName(callbackData.paymentType))
-                            sb.append("\r\n")
-                            sb.append("PlatformID:")
-                            sb.append("\r\n")
-                            sb.append(callbackData.platformID)
-                            sb.append("\r\n")
-                            sb.append("MerchantID:")
-                            sb.append("\r\n")
-                            sb.append(callbackData.merchantID)
-                            sb.append("\r\n")
-                            sb.append("CustomField:")
-                            sb.append("\r\n")
-                            sb.append(callbackData.customField)
-                            sb.append("\r\n")
-                            sb.append("\r\n")
-                            sb.append("OrderInfo.MerchantTradeNo")
-                            sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().merchantTradeNo)
-                            sb.append("\r\n")
-                            sb.append("OrderInfo.TradeDate")
-                            sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().tradeDate)
-                            sb.append("\r\n")
-                            sb.append("OrderInfo.TradeNo")
-                            sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().tradeNo)
-                            sb.append("\r\n")
-                            sb.append("OrderInfo.TradeAmt")
-                            sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().tradeAmt)
-                            sb.append("\r\n")
-                            sb.append("OrderInfo.PaymentType")
-                            sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().paymentType)
-                            sb.append("\r\n")
-                            sb.append("OrderInfo.ChargeFee")
-                            sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().chargeFee)
-                            sb.append("\r\n")
-                            sb.append("OrderInfo.TradeStatus")
-                            sb.append("\r\n")
-                            sb.append(callbackData.getOrderInfo().tradeStatus)
+            createPaymentResult(resultCode, data)
+        } else if (requestCode === PaymentkitManager.RequestCode_GooglePay) {
+            PaymentkitManager.googlePayResult(mActivity, resultCode, data)
+        }
+    }
 
-                            if (callbackData.getPaymentType() in arrayOf(
-                                    PaymentType.CreditCard,
-                                    PaymentType.CreditInstallment,
-                                    PaymentType.PeriodicFixedAmount,
-                                    PaymentType.NationalTravelCard,
-                                    PaymentType.UnionPay,
-                                    PaymentType.FlexibleInstallment
-                                )
-                            ) {
-                                sb.append("\r\n")
-                                sb.append("\r\n")
-                                sb.append("CardInfo.AuthCode")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().authCode)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Gwsr")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().gwsr)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.ProcessDate")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().processDate)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Amount")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().amount)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Eci")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().eci)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Card6No")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().card6No)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Card4No")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().card4No)
-                            }
-                            if (callbackData.getPaymentType() == PaymentType.CreditCard) {
-                                sb.append("\r\n")
-                                sb.append("CardInfo.RedDan")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().redDan)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.RedDeAmt")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().redDeAmt)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.RedOkAmt")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().redOkAmt)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.RedYet")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().redYet)
-                            }
-                            if (callbackData.getPaymentType() in arrayOf(
-                                    PaymentType.CreditInstallment,
-                                    PaymentType.FlexibleInstallment
-                                )
-                            ) {
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Stage")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().stage)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Stast")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().stast)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Staed")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().staed)
-                            }
-                            if (callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount) {
-                                sb.append("\r\n")
-                                sb.append("CardInfo.PeriodType")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().periodType)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.Frequency")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().frequency)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.ExecTimes")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().execTimes)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.PeriodAmount")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().periodAmount)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.TotalSuccessTimes")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().totalSuccessTimes)
-                                sb.append("\r\n")
-                                sb.append("CardInfo.TotalSuccessAmount")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCardInfo().totalSuccessAmount)
-                            }
+    fun createPaymentResult(resultCode: Int, data: Intent?) {
+        PaymentkitManager.createPaymentResult(
+            mActivity,
+            resultCode,
+            data,
+            CallbackFunction { callbackData ->
+                when (callbackData.callbackStatus) {
+                    CallbackStatus.Success -> if (callbackData.rtnCode == 1) {
+                        val sb = StringBuffer()
+                        sb.append("PaymentType:")
+                        sb.append("\r\n")
+                        sb.append(getPaymentTypeName(callbackData.paymentType))
+                        sb.append("\r\n")
+                        sb.append("PlatformID:")
+                        sb.append("\r\n")
+                        sb.append(callbackData.platformID)
+                        sb.append("\r\n")
+                        sb.append("MerchantID:")
+                        sb.append("\r\n")
+                        sb.append(callbackData.merchantID)
+                        sb.append("\r\n")
+                        sb.append("CustomField:")
+                        sb.append("\r\n")
+                        sb.append(callbackData.customField)
+                        sb.append("\r\n")
+                        sb.append("\r\n")
+                        sb.append("OrderInfo.MerchantTradeNo")
+                        sb.append("\r\n")
+                        sb.append(callbackData.orderInfo.merchantTradeNo)
+                        sb.append("\r\n")
+                        sb.append("OrderInfo.TradeDate")
+                        sb.append("\r\n")
+                        sb.append(callbackData.orderInfo.tradeDate)
+                        sb.append("\r\n")
+                        sb.append("OrderInfo.TradeNo")
+                        sb.append("\r\n")
+                        sb.append(callbackData.orderInfo.tradeNo)
+                        sb.append("\r\n")
+                        sb.append("OrderInfo.TradeAmt")
+                        sb.append("\r\n")
+                        sb.append(callbackData.orderInfo.tradeAmt)
+                        sb.append("\r\n")
+                        sb.append("OrderInfo.PaymentType")
+                        sb.append("\r\n")
+                        sb.append(callbackData.orderInfo.paymentType)
+                        sb.append("\r\n")
+                        sb.append("OrderInfo.ChargeFee")
+                        sb.append("\r\n")
+                        sb.append(callbackData.orderInfo.chargeFee)
+                        sb.append("\r\n")
+                        sb.append("OrderInfo.TradeStatus")
+                        sb.append("\r\n")
+                        sb.append(callbackData.orderInfo.tradeStatus)
 
-                            if (callbackData.getPaymentType() == PaymentType.ATM) {
-                                sb.append("\r\n")
-                                sb.append("\r\n")
-                                sb.append("ATMInfo.BankCode")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getAtmInfo().bankCode)
-                                sb.append("\r\n")
-                                sb.append("ATMInfo.vAccount")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getAtmInfo().vAccount)
-                                sb.append("\r\n")
-                                sb.append("ATMInfo.ExpireDate")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getAtmInfo().expireDate)
-                            }
-                            if (callbackData.getPaymentType() == PaymentType.CVS) {
-                                sb.append("\r\n")
-                                sb.append("\r\n")
-                                sb.append("CVSInfo.PaymentNo")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCvsInfo().paymentNo)
-                                sb.append("\r\n")
-                                sb.append("CVSInfo.ExpireDate")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCvsInfo().expireDate)
-                                sb.append("\r\n")
-                                sb.append("CVSInfo.PaymentURL")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getCvsInfo().paymentURL)
-                            }
-                            if (callbackData.getPaymentType() == PaymentType.Barcode) {
-                                sb.append("\r\n")
-                                sb.append("\r\n")
-                                sb.append("BarcodeInfo.ExpireDate")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getBarcodeInfo().expireDate)
-                                sb.append("\r\n")
-                                sb.append("BarcodeInfo.Barcode1")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getBarcodeInfo().barcode1)
-                                sb.append("\r\n")
-                                sb.append("BarcodeInfo.Barcode2")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getBarcodeInfo().barcode2)
-                                sb.append("\r\n")
-                                sb.append("BarcodeInfo.Barcode3")
-                                sb.append("\r\n")
-                                sb.append(callbackData.getBarcodeInfo().barcode3)
-                            }
-                            UIUtil.showAlertDialog(
-                                mActivity,
-                                "提醒您",
-                                sb.toString(),
-                                DialogInterface.OnClickListener { dialog, which -> },
-                                "確定"
+                        if (callbackData.paymentType in arrayOf(
+                                PaymentType.CreditCard,
+                                PaymentType.CreditInstallment,
+                                PaymentType.PeriodicFixedAmount,
+                                PaymentType.NationalTravelCard,
+                                PaymentType.UnionPay,
+                                PaymentType.FlexibleInstallment
                             )
-                        } else {
-                            val sb = StringBuffer()
-                            sb.append(callbackData.getRtnCode())
+                        ) {
                             sb.append("\r\n")
-                            sb.append(callbackData.getRtnMsg())
-                            UIUtil.showAlertDialog(
-                                mActivity,
-                                "提醒您",
-                                sb.toString(),
-                                DialogInterface.OnClickListener { dialog, which -> },
-                                "確定"
-                            )
+                            sb.append("\r\n")
+                            sb.append("CardInfo.AuthCode")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.authCode)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Gwsr")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.gwsr)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.ProcessDate")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.processDate)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Amount")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.amount)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Eci")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.eci)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Card6No")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.card6No)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Card4No")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.card4No)
                         }
-                        CallbackStatus.Fail -> {
-                            UIUtil.showAlertDialog(
-                                mActivity,
-                                "提醒您",
-                                "Fail Code=" + callbackData.getRtnCode() +
-                                        ", Msg=" + callbackData.getRtnMsg(),
-                                DialogInterface.OnClickListener { dialog, which -> },
-                                "確定"
-                            )
+                        if (callbackData.paymentType == PaymentType.CreditCard) {
+                            sb.append("\r\n")
+                            sb.append("CardInfo.RedDan")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.redDan)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.RedDeAmt")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.redDeAmt)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.RedOkAmt")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.redOkAmt)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.RedYet")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.redYet)
                         }
-                        CallbackStatus.Cancel -> UIUtil.showAlertDialog(
+                        if (callbackData.paymentType in arrayOf(
+                                PaymentType.CreditInstallment,
+                                PaymentType.FlexibleInstallment
+                            )
+                        ) {
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Stage")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.stage)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Stast")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.stast)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Staed")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.staed)
+                        }
+                        if (callbackData.paymentType == PaymentType.PeriodicFixedAmount) {
+                            sb.append("\r\n")
+                            sb.append("CardInfo.PeriodType")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.periodType)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.Frequency")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.frequency)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.ExecTimes")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.execTimes)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.PeriodAmount")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.periodAmount)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.TotalSuccessTimes")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.totalSuccessTimes)
+                            sb.append("\r\n")
+                            sb.append("CardInfo.TotalSuccessAmount")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cardInfo.totalSuccessAmount)
+                        }
+
+                        if (callbackData.paymentType == PaymentType.ATM) {
+                            sb.append("\r\n")
+                            sb.append("\r\n")
+                            sb.append("ATMInfo.BankCode")
+                            sb.append("\r\n")
+                            sb.append(callbackData.atmInfo.bankCode)
+                            sb.append("\r\n")
+                            sb.append("ATMInfo.vAccount")
+                            sb.append("\r\n")
+                            sb.append(callbackData.atmInfo.vAccount)
+                            sb.append("\r\n")
+                            sb.append("ATMInfo.ExpireDate")
+                            sb.append("\r\n")
+                            sb.append(callbackData.atmInfo.expireDate)
+                        }
+                        if (callbackData.paymentType == PaymentType.CVS) {
+                            sb.append("\r\n")
+                            sb.append("\r\n")
+                            sb.append("CVSInfo.PaymentNo")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cvsInfo.paymentNo)
+                            sb.append("\r\n")
+                            sb.append("CVSInfo.ExpireDate")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cvsInfo.expireDate)
+                            sb.append("\r\n")
+                            sb.append("CVSInfo.PaymentURL")
+                            sb.append("\r\n")
+                            sb.append(callbackData.cvsInfo.paymentURL)
+                        }
+                        if (callbackData.paymentType == PaymentType.Barcode) {
+                            sb.append("\r\n")
+                            sb.append("\r\n")
+                            sb.append("BarcodeInfo.ExpireDate")
+                            sb.append("\r\n")
+                            sb.append(callbackData.barcodeInfo.expireDate)
+                            sb.append("\r\n")
+                            sb.append("BarcodeInfo.Barcode1")
+                            sb.append("\r\n")
+                            sb.append(callbackData.barcodeInfo.barcode1)
+                            sb.append("\r\n")
+                            sb.append("BarcodeInfo.Barcode2")
+                            sb.append("\r\n")
+                            sb.append(callbackData.barcodeInfo.barcode2)
+                            sb.append("\r\n")
+                            sb.append("BarcodeInfo.Barcode3")
+                            sb.append("\r\n")
+                            sb.append(callbackData.barcodeInfo.barcode3)
+                        }
+                        UIUtil.showAlertDialog(
                             mActivity,
                             "提醒您",
-                            "交易取消",
+                            sb.toString(),
                             DialogInterface.OnClickListener { dialog, which -> },
                             "確定"
                         )
-                        CallbackStatus.Exit -> UIUtil.showAlertDialog(
+                    } else {
+                        val sb = StringBuffer()
+                        sb.append(callbackData.rtnCode)
+                        sb.append("\r\n")
+                        sb.append(callbackData.rtnMsg)
+                        UIUtil.showAlertDialog(
                             mActivity,
                             "提醒您",
-                            "離開",
+                            sb.toString(),
                             DialogInterface.OnClickListener { dialog, which -> },
                             "確定"
                         )
                     }
-                })
-        } else if (requestCode === PaymentkitManager.RequestCode_GooglePay) {
-            PaymentkitManager.googlePayResult(mActivity, resultCode, data)
-        }
+                    CallbackStatus.Fail -> {
+                        UIUtil.showAlertDialog(
+                            mActivity,
+                            "提醒您",
+                            "Fail Code=" + callbackData.rtnCode +
+                                    ", Msg=" + callbackData.rtnMsg,
+                            DialogInterface.OnClickListener { dialog, which -> },
+                            "確定"
+                        )
+                    }
+                    CallbackStatus.Cancel -> UIUtil.showAlertDialog(
+                        mActivity,
+                        "提醒您",
+                        "交易取消",
+                        DialogInterface.OnClickListener { dialog, which -> },
+                        "確定"
+                    )
+                    CallbackStatus.Exit -> UIUtil.showAlertDialog(
+                        mActivity,
+                        "提醒您",
+                        "離開",
+                        DialogInterface.OnClickListener { dialog, which -> },
+                        "確定"
+                    )
+                }
+            })
     }
 
     fun onSamsungPay() {
@@ -386,10 +405,10 @@ class GatewaySDKPresenter(
                 val callback =
                     CallbackFunction<GetTokenByTradeInfoCallbackData> { callbackData ->
                         try {
-                            if (callbackData.getCallbackStatus() ==
+                            if (callbackData.callbackStatus ==
                                 CallbackStatus.Success
                             ) {
-                                if (callbackData.getRtnCode() == 1) {
+                                if (callbackData.rtnCode == 1) {
                                     val cipher: Cipher =
                                         Cipher.getInstance("AES/CBC/PKCS5Padding")
                                     cipher.init(
@@ -446,10 +465,10 @@ class GatewaySDKPresenter(
                 val callback =
                     CallbackFunction<GetTokenByUserInfoCallbackData> { callbackData ->
                         try {
-                            if (callbackData.getCallbackStatus() ==
+                            if (callbackData.callbackStatus ==
                                 CallbackStatus.Success
                             ) {
-                                if (callbackData.getRtnCode() == 1) {
+                                if (callbackData.rtnCode == 1) {
                                     val cipher =
                                         Cipher.getInstance("AES/CBC/PKCS5Padding")
                                     cipher.init(
@@ -630,10 +649,10 @@ class GatewaySDKPresenter(
             Base64.encodeToString(encryptedBytes, Base64.NO_WRAP)
 
         val getTokenByTradeInfo = GetTokenByTradeInfo()
-        getTokenByTradeInfo.setRqID(System.currentTimeMillis().toString())
-        getTokenByTradeInfo.setRevision(mExampleData.revision)
-        getTokenByTradeInfo.setMerchantID(mExampleData.merchantID)
-        getTokenByTradeInfo.setData(base64Data)
+        getTokenByTradeInfo.rqID = System.currentTimeMillis().toString()
+        getTokenByTradeInfo.revision = mExampleData.revision
+        getTokenByTradeInfo.merchantID = mExampleData.merchantID
+        getTokenByTradeInfo.data = base64Data
 
         PaymentkitManager.testGetTokenByTrade(
             mActivity,
@@ -673,10 +692,10 @@ class GatewaySDKPresenter(
             Base64.encodeToString(encryptedBytes, Base64.NO_WRAP)
 
         val getTokenByUserInfo = GetTokenByUserInfo()
-        getTokenByUserInfo.setRqID(System.currentTimeMillis().toString())
-        getTokenByUserInfo.setRevision(mExampleData.revision)
-        getTokenByUserInfo.setMerchantID(mExampleData.merchantID)
-        getTokenByUserInfo.setData(base64Data)
+        getTokenByUserInfo.rqID = System.currentTimeMillis().toString()
+        getTokenByUserInfo.revision = mExampleData.revision
+        getTokenByUserInfo.merchantID = mExampleData.merchantID
+        getTokenByUserInfo.data = base64Data
 
         PaymentkitManager.testGetTokenByUser(
             mActivity,
@@ -685,6 +704,22 @@ class GatewaySDKPresenter(
     }
 
     fun onPayment() {
+        callSDKCreatePayment(ActivityResultType.Fragment)
+    }
+
+    fun onPaymentForActivity() {
+        callSDKCreatePayment(ActivityResultType.Activity)
+    }
+
+    fun onPaymentForActivityResultLauncherForFragment() {
+        callSDKCreatePayment(ActivityResultType.ActivityResultLauncherForFragment)
+    }
+
+    fun onPaymentForActivityResultLauncherForActivity() {
+        callSDKCreatePayment(ActivityResultType.ActivityResultLauncherForActivity)
+    }
+
+    fun callSDKCreatePayment(activityResultType: ActivityResultType) {
         if (!TextUtils.isEmpty(mModel.token.get())) {
             var languageCode = LanguageCode.zhTW
             when (mModel.languageSelectedPosition.get()) {
@@ -699,18 +734,67 @@ class GatewaySDKPresenter(
             if (mModel.xmlMerchantID.get() != null) {
                 xmlMerchantID = mModel.xmlMerchantID.get()
             }
-            if (TextUtils.isEmpty(xmlMerchantID)) {
-                PaymentkitManager.createPayment(
-                    mActivity, mFragment,
-                    mModel.token.get() ?: "", languageCode, useResultPage,
-                    mExampleData.appStoreName, PaymentkitManager.RequestCode_CreatePayment
-                )
-            } else {
-                PaymentkitManager.createPayment(
-                    mActivity, mFragment,
-                    mModel.token.get() ?: "", xmlMerchantID ?: "", languageCode, useResultPage,
-                    mExampleData.appStoreName, PaymentkitManager.RequestCode_CreatePayment
-                )
+            when (activityResultType) {
+                ActivityResultType.Fragment -> {
+                    if (TextUtils.isEmpty(xmlMerchantID)) {
+                        PaymentkitManager.createPayment(
+                            mActivity, mFragment,
+                            mModel.token.get() ?: "", languageCode, useResultPage,
+                            mExampleData.appStoreName, PaymentkitManager.RequestCode_CreatePayment
+                        )
+                    } else {
+                        PaymentkitManager.createPayment(
+                            mActivity, mFragment,
+                            mModel.token.get() ?: "", xmlMerchantID ?: "", languageCode, useResultPage,
+                            mExampleData.appStoreName, PaymentkitManager.RequestCode_CreatePayment
+                        )
+                    }
+                }
+                ActivityResultType.Activity -> {
+                    if (TextUtils.isEmpty(xmlMerchantID)) {
+                        PaymentkitManager.createPayment(
+                            mActivity,
+                            mModel.token.get() ?: "", languageCode, useResultPage,
+                            mExampleData.appStoreName, PaymentkitManager.RequestCode_CreatePayment
+                        )
+                    } else {
+                        PaymentkitManager.createPayment(
+                            mActivity,
+                            mModel.token.get() ?: "", xmlMerchantID ?: "", languageCode, useResultPage,
+                            mExampleData.appStoreName, PaymentkitManager.RequestCode_CreatePayment
+                        )
+                    }
+                }
+                ActivityResultType.ActivityResultLauncherForFragment -> {
+                    if (TextUtils.isEmpty(xmlMerchantID)) {
+                        PaymentkitManager.createPayment(
+                            mActivity,
+                            mModel.token.get() ?: "", languageCode, useResultPage,
+                            mExampleData.appStoreName, activityResultLauncherForFragment
+                        )
+                    } else {
+                        PaymentkitManager.createPayment(
+                            mActivity,
+                            mModel.token.get() ?: "", xmlMerchantID ?: "", languageCode, useResultPage,
+                            mExampleData.appStoreName, activityResultLauncherForFragment
+                        )
+                    }
+                }
+                ActivityResultType.ActivityResultLauncherForActivity -> {
+                    if (TextUtils.isEmpty(xmlMerchantID)) {
+                        PaymentkitManager.createPayment(
+                            mActivity,
+                            mModel.token.get() ?: "", languageCode, useResultPage,
+                            mExampleData.appStoreName, activityResultLauncherForActivity
+                        )
+                    } else {
+                        PaymentkitManager.createPayment(
+                            mActivity,
+                            mModel.token.get() ?: "", xmlMerchantID ?: "", languageCode, useResultPage,
+                            mExampleData.appStoreName, activityResultLauncherForActivity
+                        )
+                    }
+                }
             }
         } else {
             UIUtil.showAlertDialog(

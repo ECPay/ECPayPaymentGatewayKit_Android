@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import tw.com.ecpay.paymentgatewaykit.example.MainActivity
 import tw.com.ecpay.paymentgatewaykit.example.R
 import tw.com.ecpay.paymentgatewaykit.example.databinding.PgSdkExampleFragmentGatewaysdkBinding
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.ExampleData
@@ -17,7 +18,7 @@ class GatewaySDKFragment : Fragment() {
 
     companion object {
 
-        val FragmentTagName = GatewaySDKFragment::class.java.name
+        val FragmentTagName: String = GatewaySDKFragment::class.java.name
 
         fun newInstance(): GatewaySDKFragment {
             return GatewaySDKFragment()
@@ -36,7 +37,7 @@ class GatewaySDKFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = DataBindingUtil.inflate<PgSdkExampleFragmentGatewaysdkBinding>(inflater,
             R.layout.pg_sdk_example_fragment_gatewaysdk,
@@ -44,7 +45,7 @@ class GatewaySDKFragment : Fragment() {
         mModel = GatewaySDKModel()
         mModel.init()
         mExampleData = ExampleData()
-        mPresenter = GatewaySDKPresenter(activity!!, this, mModel, mExampleData)
+        mPresenter = GatewaySDKPresenter(activity!! as MainActivity, this, mModel, mExampleData)
         binding.mModel = mModel
         binding.mPresenter = mPresenter
 

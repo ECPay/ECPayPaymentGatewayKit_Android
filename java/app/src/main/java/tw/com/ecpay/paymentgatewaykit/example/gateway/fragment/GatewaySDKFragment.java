@@ -9,11 +9,12 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import tw.com.ecpay.paymentgatewaykit.example.MainActivity;
 import tw.com.ecpay.paymentgatewaykit.example.R;
 import tw.com.ecpay.paymentgatewaykit.example.databinding.PgSdkExampleFragmentGatewaysdkBinding;
+import tw.com.ecpay.paymentgatewaykit.example.gateway.model.ExampleData;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.GatewaySDKModel;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.presenter.GatewaySDKPresenter;
-import tw.com.ecpay.paymentgatewaykit.example.gateway.model.ExampleData;
 
 public class GatewaySDKFragment extends Fragment {
 
@@ -41,7 +42,7 @@ public class GatewaySDKFragment extends Fragment {
                 container, false);
         mModel = new GatewaySDKModel();
         mExampleData = new ExampleData();
-        mPresenter = new GatewaySDKPresenter(getActivity(), this, mModel, mExampleData);
+        mPresenter = new GatewaySDKPresenter((MainActivity)getActivity(), this, mModel, mExampleData);
         binding.setMModel(mModel);
         binding.setMPresenter(mPresenter);
 

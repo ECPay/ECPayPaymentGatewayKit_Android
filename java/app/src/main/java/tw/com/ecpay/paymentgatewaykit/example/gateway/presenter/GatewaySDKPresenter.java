@@ -1,11 +1,15 @@
 package tw.com.ecpay.paymentgatewaykit.example.gateway.presenter;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Base64;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.google.gson.Gson;
 
@@ -18,6 +22,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import tw.com.ecpay.paymentgatewaykit.example.ActivityResultType;
+import tw.com.ecpay.paymentgatewaykit.example.MainActivity;
 import tw.com.ecpay.paymentgatewaykit.example.R;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.ATMInfo;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.BarcodeInfo;
@@ -30,25 +36,25 @@ import tw.com.ecpay.paymentgatewaykit.example.gateway.api.GetTokenByUserData;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.OrderInfo;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.api.UnionPayInfo;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.fragment.GatewaySDKFragment;
-import tw.com.ecpay.paymentgatewaykit.example.gateway.model.GatewaySDKModel;
 import tw.com.ecpay.paymentgatewaykit.example.gateway.model.ExampleData;
+import tw.com.ecpay.paymentgatewaykit.example.gateway.model.GatewaySDKModel;
+import tw.com.ecpay.paymentgatewaykit.example.util.UIUtil;
 import tw.com.ecpay.paymentgatewaykit.example.util.Utility;
 import tw.com.ecpay.paymentgatewaykit.manager.CallbackFunction;
 import tw.com.ecpay.paymentgatewaykit.manager.CallbackStatus;
 import tw.com.ecpay.paymentgatewaykit.manager.CreatePaymentCallbackData;
+import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfo;
+import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfoCallbackData;
 import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfo;
 import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfoCallbackData;
-import tw.com.ecpay.paymentgatewaykit.manager.ServerType;
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfoCallbackData;
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfo;
 import tw.com.ecpay.paymentgatewaykit.manager.LanguageCode;
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentType;
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentkitManager;
-import tw.com.ecpay.paymentgatewaykit.example.util.UIUtil;
+import tw.com.ecpay.paymentgatewaykit.manager.ServerType;
 
 public class GatewaySDKPresenter {
 
-    private Activity mActivity;
+    private MainActivity mActivity;
 
     private GatewaySDKFragment mFragment;
 
@@ -58,7 +64,9 @@ public class GatewaySDKPresenter {
 
     private ExecutorService service = Executors.newSingleThreadExecutor();
 
-    public GatewaySDKPresenter(Activity mActivity,
+    private ActivityResultLauncher<Intent> activityResultLauncherForFragment, activityResultLauncherForActivity;
+
+    public GatewaySDKPresenter(MainActivity mActivity,
                                GatewaySDKFragment mFragment,
                                GatewaySDKModel mModel,
                                ExampleData mExampleData) {
@@ -66,6 +74,24 @@ public class GatewaySDKPresenter {
         this.mFragment = mFragment;
         this.mModel = mModel;
         this.mExampleData = mExampleData;
+        registerForActivityResult();
+    }
+
+    private void registerForActivityResult() {
+        activityResultLauncherForFragment = mFragment.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                Utility.log("Fragment ActivityResultCallback.onActivityResult(), resultCode:" + result.getResultCode());
+                createPaymentResult(result.getResultCode(), result.getData());
+            }
+        });
+        activityResultLauncherForActivity = mActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                Utility.log("Activity ActivityResultCallback.onActivityResult(), resultCode:" + result.getResultCode());
+                createPaymentResult(result.getResultCode(), result.getData());
+            }
+        });
     }
 
     public void init() {
@@ -102,260 +128,265 @@ public class GatewaySDKPresenter {
     }
 
     public void onGooglePay() {
-
+        PaymentkitManager.onGooglePay(mActivity,
+                PaymentkitManager.RequestCode_GooglePay);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Utility.log("onActivityResult(), requestCode:" + requestCode + ", resultCode:" + resultCode);
         if(requestCode == PaymentkitManager.RequestCode_CreatePayment) {
-            PaymentkitManager.createPaymentResult(mActivity, resultCode, data, new CallbackFunction<CreatePaymentCallbackData>() {
-                @Override
-                public void callback(CreatePaymentCallbackData callbackData) {
-                    switch (callbackData.getCallbackStatus()) {
-                        case Success:
-                            if(callbackData.getRtnCode() == 1) {
-                                StringBuffer sb = new StringBuffer();
-                                sb.append("PaymentType:");
-                                sb.append("\r\n");
-                                sb.append(getPaymentTypeName(callbackData.getPaymentType()));
-                                sb.append("\r\n");
-                                sb.append("PlatformID:");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getPlatformID());
-                                sb.append("\r\n");
-                                sb.append("MerchantID:");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getMerchantID());
-                                sb.append("\r\n");
-                                sb.append("CustomField:");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getCustomField());
-                                sb.append("\r\n");
-                                sb.append("\r\n");
-                                sb.append("OrderInfo.MerchantTradeNo");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getOrderInfo().getMerchantTradeNo());
-                                sb.append("\r\n");
-                                sb.append("OrderInfo.TradeDate");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getOrderInfo().getTradeDate());
-                                sb.append("\r\n");
-                                sb.append("OrderInfo.TradeNo");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getOrderInfo().getTradeNo());
-                                sb.append("\r\n");
-                                sb.append("OrderInfo.TradeAmt");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getOrderInfo().getTradeAmt());
-                                sb.append("\r\n");
-                                sb.append("OrderInfo.PaymentType");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getOrderInfo().getPaymentType());
-                                sb.append("\r\n");
-                                sb.append("OrderInfo.ChargeFee");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getOrderInfo().getChargeFee());
-                                sb.append("\r\n");
-                                sb.append("OrderInfo.TradeStatus");
-                                sb.append("\r\n");
-                                sb.append(callbackData.getOrderInfo().getTradeStatus());
-
-                                if(callbackData.getPaymentType() == PaymentType.CreditCard ||
-                                        callbackData.getPaymentType() == PaymentType.CreditInstallment ||
-                                        callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount ||
-                                        callbackData.getPaymentType() == PaymentType.NationalTravelCard ||
-                                        callbackData.getPaymentType() == PaymentType.UnionPay ||
-                                        callbackData.getPaymentType() == PaymentType.FlexibleInstallment) {
-                                    sb.append("\r\n");
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.AuthCode");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getAuthCode());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Gwsr");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getGwsr());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.ProcessDate");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getProcessDate());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Amount");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getAmount());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Eci");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getEci());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Card6No");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getCard6No());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Card4No");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getCard4No());
-                                }
-                                if(callbackData.getPaymentType() == PaymentType.CreditCard) {
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.RedDan");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getRedDan());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.RedDeAmt");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getRedDeAmt());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.RedOkAmt");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getRedOkAmt());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.RedYet");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getRedYet());
-                                }
-                                if(callbackData.getPaymentType() == PaymentType.CreditInstallment ||
-                                        callbackData.getPaymentType() == PaymentType.FlexibleInstallment) {
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Stage");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getStage());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Stast");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getStast());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Staed");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getStaed());
-                                }
-                                if(callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount) {
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.PeriodType");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getPeriodType());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.Frequency");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getFrequency());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.ExecTimes");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getExecTimes());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.PeriodAmount");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getPeriodAmount());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.TotalSuccessTimes");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getTotalSuccessTimes());
-                                    sb.append("\r\n");
-                                    sb.append("CardInfo.TotalSuccessAmount");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCardInfo().getTotalSuccessAmount());
-                                }
-
-                                if(callbackData.getPaymentType() == PaymentType.ATM) {
-                                    sb.append("\r\n");
-                                    sb.append("\r\n");
-                                    sb.append("ATMInfo.BankCode");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getAtmInfo().getBankCode());
-                                    sb.append("\r\n");
-                                    sb.append("ATMInfo.vAccount");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getAtmInfo().getvAccount());
-                                    sb.append("\r\n");
-                                    sb.append("ATMInfo.ExpireDate");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getAtmInfo().getExpireDate());
-                                }
-                                if(callbackData.getPaymentType() == PaymentType.CVS) {
-                                    sb.append("\r\n");
-                                    sb.append("\r\n");
-                                    sb.append("CVSInfo.PaymentNo");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCvsInfo().getPaymentNo());
-                                    sb.append("\r\n");
-                                    sb.append("CVSInfo.ExpireDate");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCvsInfo().getExpireDate());
-                                    sb.append("\r\n");
-                                    sb.append("CVSInfo.PaymentURL");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getCvsInfo().getPaymentURL());
-                                }
-                                if(callbackData.getPaymentType() == PaymentType.Barcode) {
-                                    sb.append("\r\n");
-                                    sb.append("\r\n");
-                                    sb.append("BarcodeInfo.ExpireDate");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getBarcodeInfo().getExpireDate());
-                                    sb.append("\r\n");
-                                    sb.append("BarcodeInfo.Barcode1");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getBarcodeInfo().getBarcode1());
-                                    sb.append("\r\n");
-                                    sb.append("BarcodeInfo.Barcode2");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getBarcodeInfo().getBarcode2());
-                                    sb.append("\r\n");
-                                    sb.append("BarcodeInfo.Barcode3");
-                                    sb.append("\r\n");
-                                    sb.append(callbackData.getBarcodeInfo().getBarcode3());
-                                }
-
-                                UIUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                }, "確定");
-                            } else {
-                                StringBuffer sb = new StringBuffer();
-                                sb.append(callbackData.getRtnCode());
-                                sb.append("\r\n");
-                                sb.append(callbackData.getRtnMsg());
-
-                                UIUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                }, "確定");
-                            }
-                            break;
-                        case Fail:
-                            UIUtil.showAlertDialog(mActivity, "提醒您", "Fail Code=" + callbackData.getRtnCode() + ", Msg=" + callbackData.getRtnMsg(), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                }
-                            }, "確定");
-                            break;
-                        case Cancel:
-                            UIUtil.showAlertDialog(mActivity, "提醒您", "交易取消", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                }
-                            }, "確定");
-                            break;
-                        case Exit:
-                            UIUtil.showAlertDialog(mActivity, "提醒您", "離開", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                }
-                            }, "確定");
-                            break;
-                    }
-                }
-            });
+            createPaymentResult(resultCode, data);
         } else if(requestCode == PaymentkitManager.RequestCode_GooglePay) {
             PaymentkitManager.googlePayResult(mActivity, resultCode, data);
         }
+    }
+
+    private void createPaymentResult(int resultCode, Intent data) {
+        PaymentkitManager.createPaymentResult(mActivity, resultCode, data, new CallbackFunction<CreatePaymentCallbackData>() {
+            @Override
+            public void callback(CreatePaymentCallbackData callbackData) {
+                switch (callbackData.getCallbackStatus()) {
+                    case Success:
+                        if(callbackData.getRtnCode() == 1) {
+                            StringBuffer sb = new StringBuffer();
+                            sb.append("PaymentType:");
+                            sb.append("\r\n");
+                            sb.append(getPaymentTypeName(callbackData.getPaymentType()));
+                            sb.append("\r\n");
+                            sb.append("PlatformID:");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getPlatformID());
+                            sb.append("\r\n");
+                            sb.append("MerchantID:");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getMerchantID());
+                            sb.append("\r\n");
+                            sb.append("CustomField:");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getCustomField());
+                            sb.append("\r\n");
+                            sb.append("\r\n");
+                            sb.append("OrderInfo.MerchantTradeNo");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getOrderInfo().getMerchantTradeNo());
+                            sb.append("\r\n");
+                            sb.append("OrderInfo.TradeDate");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getOrderInfo().getTradeDate());
+                            sb.append("\r\n");
+                            sb.append("OrderInfo.TradeNo");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getOrderInfo().getTradeNo());
+                            sb.append("\r\n");
+                            sb.append("OrderInfo.TradeAmt");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getOrderInfo().getTradeAmt());
+                            sb.append("\r\n");
+                            sb.append("OrderInfo.PaymentType");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getOrderInfo().getPaymentType());
+                            sb.append("\r\n");
+                            sb.append("OrderInfo.ChargeFee");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getOrderInfo().getChargeFee());
+                            sb.append("\r\n");
+                            sb.append("OrderInfo.TradeStatus");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getOrderInfo().getTradeStatus());
+
+                            if(callbackData.getPaymentType() == PaymentType.CreditCard ||
+                                    callbackData.getPaymentType() == PaymentType.CreditInstallment ||
+                                    callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount ||
+                                    callbackData.getPaymentType() == PaymentType.NationalTravelCard ||
+                                    callbackData.getPaymentType() == PaymentType.UnionPay ||
+                                    callbackData.getPaymentType() == PaymentType.FlexibleInstallment) {
+                                sb.append("\r\n");
+                                sb.append("\r\n");
+                                sb.append("CardInfo.AuthCode");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getAuthCode());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Gwsr");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getGwsr());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.ProcessDate");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getProcessDate());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Amount");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getAmount());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Eci");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getEci());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Card6No");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getCard6No());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Card4No");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getCard4No());
+                            }
+                            if(callbackData.getPaymentType() == PaymentType.CreditCard) {
+                                sb.append("\r\n");
+                                sb.append("CardInfo.RedDan");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getRedDan());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.RedDeAmt");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getRedDeAmt());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.RedOkAmt");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getRedOkAmt());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.RedYet");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getRedYet());
+                            }
+                            if(callbackData.getPaymentType() == PaymentType.CreditInstallment ||
+                                    callbackData.getPaymentType() == PaymentType.FlexibleInstallment) {
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Stage");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getStage());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Stast");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getStast());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Staed");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getStaed());
+                            }
+                            if(callbackData.getPaymentType() == PaymentType.PeriodicFixedAmount) {
+                                sb.append("\r\n");
+                                sb.append("CardInfo.PeriodType");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getPeriodType());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.Frequency");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getFrequency());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.ExecTimes");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getExecTimes());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.PeriodAmount");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getPeriodAmount());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.TotalSuccessTimes");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getTotalSuccessTimes());
+                                sb.append("\r\n");
+                                sb.append("CardInfo.TotalSuccessAmount");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCardInfo().getTotalSuccessAmount());
+                            }
+
+                            if(callbackData.getPaymentType() == PaymentType.ATM) {
+                                sb.append("\r\n");
+                                sb.append("\r\n");
+                                sb.append("ATMInfo.BankCode");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getAtmInfo().getBankCode());
+                                sb.append("\r\n");
+                                sb.append("ATMInfo.vAccount");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getAtmInfo().getvAccount());
+                                sb.append("\r\n");
+                                sb.append("ATMInfo.ExpireDate");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getAtmInfo().getExpireDate());
+                            }
+                            if(callbackData.getPaymentType() == PaymentType.CVS) {
+                                sb.append("\r\n");
+                                sb.append("\r\n");
+                                sb.append("CVSInfo.PaymentNo");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCvsInfo().getPaymentNo());
+                                sb.append("\r\n");
+                                sb.append("CVSInfo.ExpireDate");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCvsInfo().getExpireDate());
+                                sb.append("\r\n");
+                                sb.append("CVSInfo.PaymentURL");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCvsInfo().getPaymentURL());
+                            }
+                            if(callbackData.getPaymentType() == PaymentType.Barcode) {
+                                sb.append("\r\n");
+                                sb.append("\r\n");
+                                sb.append("BarcodeInfo.ExpireDate");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getBarcodeInfo().getExpireDate());
+                                sb.append("\r\n");
+                                sb.append("BarcodeInfo.Barcode1");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getBarcodeInfo().getBarcode1());
+                                sb.append("\r\n");
+                                sb.append("BarcodeInfo.Barcode2");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getBarcodeInfo().getBarcode2());
+                                sb.append("\r\n");
+                                sb.append("BarcodeInfo.Barcode3");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getBarcodeInfo().getBarcode3());
+                            }
+
+                            UIUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            }, "確定");
+                        } else {
+                            StringBuffer sb = new StringBuffer();
+                            sb.append(callbackData.getRtnCode());
+                            sb.append("\r\n");
+                            sb.append(callbackData.getRtnMsg());
+
+                            UIUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            }, "確定");
+                        }
+                        break;
+                    case Fail:
+                        UIUtil.showAlertDialog(mActivity, "提醒您", "Fail Code=" + callbackData.getRtnCode() + ", Msg=" + callbackData.getRtnMsg(), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }, "確定");
+                        break;
+                    case Cancel:
+                        UIUtil.showAlertDialog(mActivity, "提醒您", "交易取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }, "確定");
+                        break;
+                    case Exit:
+                        UIUtil.showAlertDialog(mActivity, "提醒您", "離開", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }, "確定");
+                        break;
+                }
+            }
+        });
     }
 
     public void onSamsungPay() {
@@ -545,7 +576,7 @@ public class GatewaySDKPresenter {
                 dateFormat.format(System.currentTimeMillis()),
                 String.valueOf(System.currentTimeMillis()),
                 totalAmount,
-                "https://www.ecpay.com.tw/" ,
+                "https://www.ecpay.com.tw/",
                 "交易測試",
                 "測試商品");
 
@@ -669,6 +700,22 @@ public class GatewaySDKPresenter {
     }
 
     public void onPayment() {
+        callSDKCreatePayment(ActivityResultType.Fragment);
+    }
+
+    public void onPaymentForActivity() {
+        callSDKCreatePayment(ActivityResultType.Activity);
+    }
+
+    public void onPaymentForActivityResultLauncherForFragment() {
+        callSDKCreatePayment(ActivityResultType.ActivityResultLauncherForFragment);
+    }
+
+    public void onPaymentForActivityResultLauncherForActivity() {
+        callSDKCreatePayment(ActivityResultType.ActivityResultLauncherForActivity);
+    }
+
+    private void callSDKCreatePayment(ActivityResultType activityResultType) {
         if(!TextUtils.isEmpty(mModel.token.get())) {
 
             LanguageCode languageCode = LanguageCode.zhTW;
@@ -691,14 +738,51 @@ public class GatewaySDKPresenter {
                 xmlMerchantID = mModel.xmlMerchantID.get();
             }
 
-            if(TextUtils.isEmpty(xmlMerchantID)) {
-                PaymentkitManager.createPayment(mActivity, mFragment,
-                        mModel.token.get(), languageCode, useResultPage,
-                        mExampleData.getAppStoreName(), PaymentkitManager.RequestCode_CreatePayment);
-            } else {
-                PaymentkitManager.createPayment(mActivity, mFragment,
-                        mModel.token.get(), xmlMerchantID, languageCode, useResultPage,
-                        mExampleData.getAppStoreName(), PaymentkitManager.RequestCode_CreatePayment);
+            switch (activityResultType) {
+                case Fragment:
+                    if(TextUtils.isEmpty(xmlMerchantID)) {
+                        PaymentkitManager.createPayment(mActivity, mFragment,
+                                mModel.token.get(), languageCode, useResultPage,
+                                mExampleData.getAppStoreName(), PaymentkitManager.RequestCode_CreatePayment);
+                    } else {
+                        PaymentkitManager.createPayment(mActivity, mFragment,
+                                mModel.token.get(), xmlMerchantID, languageCode, useResultPage,
+                                mExampleData.getAppStoreName(), PaymentkitManager.RequestCode_CreatePayment);
+                    }
+                    break;
+                case Activity:
+                    if(TextUtils.isEmpty(xmlMerchantID)) {
+                        PaymentkitManager.createPayment(mActivity,
+                                mModel.token.get(), languageCode, useResultPage,
+                                mExampleData.getAppStoreName(), PaymentkitManager.RequestCode_CreatePayment);
+                    } else {
+                        PaymentkitManager.createPayment(mActivity,
+                                mModel.token.get(), xmlMerchantID, languageCode, useResultPage,
+                                mExampleData.getAppStoreName(), PaymentkitManager.RequestCode_CreatePayment);
+                    }
+                    break;
+                case ActivityResultLauncherForFragment:
+                    if(TextUtils.isEmpty(xmlMerchantID)) {
+                        PaymentkitManager.createPayment(mActivity,
+                                mModel.token.get(), languageCode, useResultPage,
+                                mExampleData.getAppStoreName(), activityResultLauncherForFragment);
+                    } else {
+                        PaymentkitManager.createPayment(mActivity,
+                                mModel.token.get(), xmlMerchantID, languageCode, useResultPage,
+                                mExampleData.getAppStoreName(), activityResultLauncherForFragment);
+                    }
+                    break;
+                case ActivityResultLauncherForActivity:
+                    if(TextUtils.isEmpty(xmlMerchantID)) {
+                        PaymentkitManager.createPayment(mActivity,
+                                mModel.token.get(), languageCode, useResultPage,
+                                mExampleData.getAppStoreName(), activityResultLauncherForActivity);
+                    } else {
+                        PaymentkitManager.createPayment(mActivity,
+                                mModel.token.get(), xmlMerchantID, languageCode, useResultPage,
+                                mExampleData.getAppStoreName(), activityResultLauncherForActivity);
+                    }
+                    break;
             }
 
         } else {
@@ -710,5 +794,4 @@ public class GatewaySDKPresenter {
             }, "確定");
         }
     }
-
 }

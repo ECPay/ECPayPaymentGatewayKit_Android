@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this,
             R.layout.pg_sdk_example_activity_main)
 
-        getSupportFragmentManager().beginTransaction()
+        supportFragmentManager.beginTransaction()
             .replace(R.id.frameLayout, GatewaySDKFragment.newInstance(),
                 GatewaySDKFragment.FragmentTagName)
             .commit()

@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:7.0.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
 
@@ -33,18 +33,17 @@ ext {
     versionNumber = "1"
     versionName = "1.0.0"
 
-    compileSdkVersion = 30
-    buildToolsVersion = "30.0.2"
-    minSdkVersion = "21"
-    targetSdkVersion = "30"
+    compileSdkVersion = 31
+    buildToolsVersion = "31.0.0"
+    minSdkVersion = 21
+    targetSdkVersion = 31
 
     //android x
-    androidxCoreKtxLibVersion = "1.3.1"
-    androidxAppcompatLibVersion = "1.2.0"
+    androidxAppcompatLibVersion = "1.3.0"
 
     //lib
     materialLibVersion = "1.1.0"
-    gsonLibVersion = "2.8.5"
+    gsonLibVersion = "2.9.0"
     okhttp3LibVersion = "4.6.0"
     retrofit2LibVersion = "2.8.1"
     zxingCoreLibVersion = "3.3.0"

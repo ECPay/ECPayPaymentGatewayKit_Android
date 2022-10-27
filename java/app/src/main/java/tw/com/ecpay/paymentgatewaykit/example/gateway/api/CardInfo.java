@@ -112,5 +112,4 @@ public class CardInfo {
         this.TravelEndDate = TravelEndDate;
         this.TravelCounty = TravelCounty;
     }
-
 }

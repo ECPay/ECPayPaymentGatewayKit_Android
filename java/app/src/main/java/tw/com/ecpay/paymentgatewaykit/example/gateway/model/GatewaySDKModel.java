@@ -29,5 +29,4 @@ public class GatewaySDKModel {
     public GatewaySDKModel() {
         getTokenType.set(R.id.getTokenType1);
     }
-
 }

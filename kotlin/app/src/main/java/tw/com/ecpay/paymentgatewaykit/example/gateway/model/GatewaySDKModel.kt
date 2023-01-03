@@ -19,6 +19,8 @@ class GatewaySDKModel {
 
     val xmlMerchantID = ObservableField<String>()
 
+    val titleBarBackgroundColor = ObservableField<String>()
+
     val threeDSwitch = ObservableField<Boolean>()
 
     val redeemSwitch = ObservableField<Boolean>()

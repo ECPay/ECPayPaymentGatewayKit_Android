@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
 
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.3.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.4.0'
 }
 
 ````
@@ -85,7 +85,9 @@ SDK 涵蓋以下環境
 
 
 * ### CreatePayment
-  產生信用卡刷卡功能
+  
+
+產生信用卡刷卡功能
 
 onCreateView
 
@@ -361,7 +363,16 @@ private void createPaymentResult(int resultCode, Intent data) {
     });
 }
 ````
+- ### setTitleBarBackgroundColor 
+
+設定titlebar背景顏色功能
+
+```java
+PaymentkitManager.setTitleBarBackgroundColor(mActivity, mModel.titleBarBackgroundColor.get());
+```
+
 #### callback 狀態
+
 ````
 callback 包含以下狀態
 * Fail：執行失敗

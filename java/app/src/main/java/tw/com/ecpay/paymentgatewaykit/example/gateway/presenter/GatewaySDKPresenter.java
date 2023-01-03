@@ -703,6 +703,16 @@ public class GatewaySDKPresenter {
         callSDKCreatePayment(ActivityResultType.Fragment);
     }
 
+    public void setTitleBarBackgroundColor(){
+        boolean check = PaymentkitManager.setTitleBarBackgroundColor(mActivity, mModel.titleBarBackgroundColor.get());
+        UIUtil.showAlertDialog(mActivity, "提醒您", check?"設定成功":"設定失敗", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        }, "確定");
+    }
+
     public void onPaymentForActivity() {
         callSDKCreatePayment(ActivityResultType.Activity);
     }

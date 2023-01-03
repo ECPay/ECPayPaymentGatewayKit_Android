@@ -707,6 +707,16 @@ class GatewaySDKPresenter(
         callSDKCreatePayment(ActivityResultType.Fragment)
     }
 
+    fun setTitleBarBackgroundColor() {
+        val check = PaymentkitManager.setTitleBarBackgroundColor(
+            mActivity,
+            mModel.titleBarBackgroundColor.get()
+        )
+        UIUtil.showAlertDialog(mActivity, "提醒您", if (check) "設定成功" else "設定失敗",
+            { dialog, which -> }, "確定"
+        )
+    }
+
     fun onPaymentForActivity() {
         callSDKCreatePayment(ActivityResultType.Activity)
     }

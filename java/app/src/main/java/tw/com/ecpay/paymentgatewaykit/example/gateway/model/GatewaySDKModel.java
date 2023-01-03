@@ -20,6 +20,8 @@ public class GatewaySDKModel {
 
     public final ObservableField<String> xmlMerchantID = new ObservableField<>();
 
+    public final ObservableField<String> titleBarBackgroundColor = new ObservableField<>();
+
     public final ObservableField<Boolean> threeDSwitch = new ObservableField<>();
 
     public final ObservableField<Boolean> redeemSwitch = new ObservableField<>();

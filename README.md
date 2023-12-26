@@ -23,7 +23,7 @@
 
 ##  Installation
 
-ECPay Payment SDK公開於[Maven Central](https://search.maven.org/)來源庫
+ECPay Payment SDK公開於[Maven Central](https://central.sonatype.com/)來源庫
 
 請於````app/build.gradle````檔案加上dataBinding設定
 
@@ -52,7 +52,7 @@ dependencies {
 }
 
 ````
-````project/build.gradle````檔案加入[Maven Central](https://search.maven.org/)
+````project/build.gradle````檔案加入[Maven Central](https://central.sonatype.com/)
 
 ````gradle
 buildscript {

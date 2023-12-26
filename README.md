@@ -2,7 +2,7 @@
 ## https://member.ecpay.com.tw/MemberReg/MerchantRegister
 
 # 站內付2.0_Android版
-[![Maven Central](https://img.shields.io/maven-central/v/tw.com.ecpay/ECPayPaymentGatewayKit.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22tw.com.ecpay%22%20AND%20a:%22ECPayPaymentGatewayKit%22)
+[![Maven Central](https://img.shields.io/maven-central/v/tw.com.ecpay/ECPayPaymentGatewayKit.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=g:tw.com.ecpay%20%20a:ECPayPaymentGatewayKit)
 
 
 ## About

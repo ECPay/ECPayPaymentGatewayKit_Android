@@ -7,7 +7,6 @@ public class Utility {
     private static final String TAG = "ECPayPaymentGatewayKit_Example";
 
     private Utility() {
-
     }
 
     /**
@@ -83,5 +82,4 @@ public class Utility {
             log(Log.ERROR, tag, Log.getStackTraceString(ex));
         }
     }
-
 }

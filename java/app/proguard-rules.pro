@@ -21,4 +21,4 @@
 #-renamesourcefileattribute SourceFile
 
 #### Network API JSON
--keep class tw.com.ecpay.paymentgatewaykit.example.gateway.api.** { *; }
+-keep class tw.com.ecpay.paymentgatewaykit.example.api.** { *; }

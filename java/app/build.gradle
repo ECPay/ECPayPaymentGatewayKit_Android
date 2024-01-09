@@ -68,28 +68,22 @@ android {
     }
 }
 
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
-
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
     implementation "androidx.appcompat:appcompat:${rootProject.ext.androidxAppcompatLibVersion}"
+
     implementation "com.google.android.material:material:${rootProject.ext.materialLibVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonLibVersion}"
     implementation "com.google.zxing:core:${rootProject.ext.zxingCoreLibVersion}"
+
     implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3LibVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.okhttp3LibVersion}"
     implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.retrofit2LibVersion}"
     implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.retrofit2LibVersion}"
 
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.4.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.5.0'
 
     testImplementation 'junit:junit:4.13.2'
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }

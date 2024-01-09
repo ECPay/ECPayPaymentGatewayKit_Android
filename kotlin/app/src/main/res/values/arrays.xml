@@ -4,4 +4,9 @@
         <item>zh-TW</item>
         <item>en-US</item>
     </string-array>
+    <string-array name="orientationArray">
+        <item>0：portrait</item>
+        <item>1：landscape</item>
+        <item>2：unspecified</item>
+    </string-array>
 </resources>

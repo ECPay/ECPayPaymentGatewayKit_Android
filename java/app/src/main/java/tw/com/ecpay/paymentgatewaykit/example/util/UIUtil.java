@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog;
 public class UIUtil {
 
     private UIUtil() {
-
     }
 
     /**
@@ -59,5 +58,4 @@ public class UIUtil {
         dialog.setNegativeButton(rightButtonName, listenerRightButton);
         dialog.show();
     }
-
 }

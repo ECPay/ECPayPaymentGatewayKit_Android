@@ -6,14 +6,13 @@
     </data>
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <FrameLayout
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
     </LinearLayout>
 </layout>

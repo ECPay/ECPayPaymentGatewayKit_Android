@@ -19,13 +19,15 @@
 - Java JDK `11`
 - Android Gradle Plugin `7.0.4` (Android Studio Arctic Fox (2020.3.1) Patch 4)
 - minSdkVersion `21` (Android 5.0)
-- targetSdkVersion `31` (Android 12.0)
+- targetSdkVersion `33` (Android 13.0)
 
 ##  Installation
 
 ECPay Payment SDK公開於[Maven Central](https://central.sonatype.com/)來源庫
 
-請於````app/build.gradle````檔案加上dataBinding設定
+採用 `Groovy 語法gradle設定方式`
+
+請於`app/build.gradle`檔案加上dataBinding設定
 
 ````gradle
 android {
@@ -34,25 +36,27 @@ android {
     }
 }
 ````
-````app/build.gradle````檔案新增dependencies
+`app/build.gradle`檔案新增dependencies
 
 ````gradle
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.0'
+    
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'com.google.zxing:core:3.3.0'
-    implementation 'com.squareup.okhttp3:okhttp:4.6.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.6.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
-    implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
+    
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.4.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.5.0'
 }
 
 ````
-````project/build.gradle````檔案加入[Maven Central](https://central.sonatype.com/)
+`project/build.gradle`檔案加入[Maven Central](https://central.sonatype.com/)
 
 ````gradle
 buildscript {
@@ -94,12 +98,12 @@ onCreateView
 產生 ActivityResult 接收
 
 ````java
-private ActivityResultLauncher<Intent> activityResultLauncherForFragment;
+private ActivityResultLauncher<Intent> activityResultLauncher;
 
-activityResultLauncherForFragment = mFragment.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+activityResultLauncher = mFragment.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
     @Override
     public void onActivityResult(ActivityResult result) {
-        Utility.log("Fragment ActivityResultCallback.onActivityResult(), resultCode:" + result.getResultCode());
+        Utility.log("Activity ActivityResultCallback.onActivityResult(), resultCode:" + result.getResultCode());
         createPaymentResult(result.getResultCode(), result.getData());
     }
 });
@@ -108,8 +112,11 @@ activityResultLauncherForFragment = mFragment.registerForActivityResult(new Acti
 
 ```java
 PaymentkitManager.createPayment(mActivity,
-        mModel.token.get(), languageCode, useResultPage,
-        mExampleData.getAppStoreName(), activityResultLauncherForActivity);
+        mModel.token.get(),
+        languageCode,
+        useResultPage,
+        mExampleData.getAppStoreName(),
+        activityResultLauncher);
 ```
 
 createPaymentResult
@@ -369,6 +376,14 @@ private void createPaymentResult(int resultCode, Intent data) {
 
 ```java
 PaymentkitManager.setTitleBarBackgroundColor(mActivity, mModel.titleBarBackgroundColor.get());
+```
+
+- ### setOrientation
+
+設定設定畫面方向
+
+```
+PaymentkitManager.setOrientation(mActivity, position);
 ```
 
 #### callback 狀態

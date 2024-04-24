@@ -80,7 +80,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.retrofit2LibVersion}"
     implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.retrofit2LibVersion}"
 
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.5.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.6.0'
 
     testImplementation 'junit:junit:4.13.2'
 

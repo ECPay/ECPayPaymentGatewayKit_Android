@@ -52,7 +52,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.5.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.6.0'
 }
 
 ````

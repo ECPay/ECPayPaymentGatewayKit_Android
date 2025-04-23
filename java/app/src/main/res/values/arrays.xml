@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="languageArray">
+    <string-array name="pg_sdk_example_languageArray">
         <item>zh-TW</item>
         <item>en-US</item>
     </string-array>
-    <string-array name="orientationArray">
+    <string-array name="pg_sdk_example_orientationArray">
         <item>0：portrait</item>
         <item>1：landscape</item>
         <item>2：unspecified</item>

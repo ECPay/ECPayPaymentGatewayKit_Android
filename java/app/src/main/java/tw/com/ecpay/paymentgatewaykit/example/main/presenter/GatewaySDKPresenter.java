@@ -1,54 +1,30 @@
 package tw.com.ecpay.paymentgatewaykit.example.main.presenter;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
-import com.google.gson.Gson;
-
-import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
 import tw.com.ecpay.paymentgatewaykit.example.R;
-import tw.com.ecpay.paymentgatewaykit.example.api.ATMInfo;
-import tw.com.ecpay.paymentgatewaykit.example.api.BarcodeInfo;
-import tw.com.ecpay.paymentgatewaykit.example.api.CVSInfo;
-import tw.com.ecpay.paymentgatewaykit.example.api.CardInfo;
-import tw.com.ecpay.paymentgatewaykit.example.api.ConsumerInfo;
-import tw.com.ecpay.paymentgatewaykit.example.api.DecData;
-import tw.com.ecpay.paymentgatewaykit.example.api.GetTokenByTradeData;
-import tw.com.ecpay.paymentgatewaykit.example.api.GetTokenByUserData;
-import tw.com.ecpay.paymentgatewaykit.example.api.OrderInfo;
-import tw.com.ecpay.paymentgatewaykit.example.api.UnionPayInfo;
-import tw.com.ecpay.paymentgatewaykit.example.main.model.ExampleData;
 import tw.com.ecpay.paymentgatewaykit.example.main.model.GatewaySDKModel;
 import tw.com.ecpay.paymentgatewaykit.example.main.view.MainActivity;
 import tw.com.ecpay.paymentgatewaykit.example.main.view.fragment.GatewaySDKFragment;
-import tw.com.ecpay.paymentgatewaykit.example.util.UIUtil;
-import tw.com.ecpay.paymentgatewaykit.example.util.Utility;
+import tw.com.ecpay.paymentgatewaykit.example.util.AlertUtil;
+import tw.com.ecpay.paymentgatewaykit.example.util.LogUtil;
 import tw.com.ecpay.paymentgatewaykit.manager.CallbackFunction;
-import tw.com.ecpay.paymentgatewaykit.manager.CallbackStatus;
 import tw.com.ecpay.paymentgatewaykit.manager.CreatePaymentCallbackData;
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfo;
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfoCallbackData;
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfo;
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfoCallbackData;
 import tw.com.ecpay.paymentgatewaykit.manager.LanguageCode;
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentType;
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentkitManager;
+import tw.com.ecpay.paymentgatewaykit.manager.SDKConfig;
+import tw.com.ecpay.paymentgatewaykit.manager.SDKConfigBuilder;
 import tw.com.ecpay.paymentgatewaykit.manager.ServerType;
 
 public class GatewaySDKPresenter {
@@ -59,27 +35,25 @@ public class GatewaySDKPresenter {
 
     private GatewaySDKModel mModel;
 
-    private ExampleData mExampleData;
-
     private ExecutorService service = Executors.newSingleThreadExecutor();
 
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
+    private String appStoreName = "綠界測試商店";
+
     public GatewaySDKPresenter(MainActivity mActivity,
                                GatewaySDKFragment mFragment,
-                               GatewaySDKModel mModel,
-                               ExampleData mExampleData) {
+                               GatewaySDKModel mModel) {
         this.mActivity = mActivity;
         this.mFragment = mFragment;
         this.mModel = mModel;
-        this.mExampleData = mExampleData;
     }
 
     private void registerForActivityResult() {
         activityResultLauncher = mFragment.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {
-                Utility.log("Activity ActivityResultCallback.onActivityResult(), resultCode:" + result.getResultCode());
+                LogUtil.log("Activity ActivityResultCallback.onActivityResult(), resultCode:" + result.getResultCode());
                 createPaymentResult(result.getResultCode(), result.getData());
             }
         });
@@ -90,8 +64,6 @@ public class GatewaySDKPresenter {
         ServerType serverType = ServerType.Stage;
         String typeStr = "stage";
 
-        updateExampleData();
-
         mModel.description.set(mActivity.getString(R.string.app_name) + " " + typeStr);
         mModel.sdkVersion.set(PaymentkitManager.getPaymentgatewaykitVersion());
 
@@ -99,24 +71,10 @@ public class GatewaySDKPresenter {
     }
 
     private void sdkInit(ServerType serverType) {
-        PaymentkitManager.initialize(mActivity, serverType);
-    }
-
-    private void updateExampleData() {
-        if(mModel.threeDSwitch.get()!=null &&
-                mModel.threeDSwitch.get()) {
-            mExampleData.setMerchantID("3002607");
-            mExampleData.setAesKey("pwFHCqoQZGmho4w6");
-            mExampleData.setAesIv("EkRm7iFT261dpevs");
-        } else {
-            mExampleData.setMerchantID("2000132");
-            mExampleData.setAesKey("5294y06JbISpM5x9");
-            mExampleData.setAesIv("v77hoKGq4kWxNNIS");
-        }
-    }
-
-    public void onThreeDSwitch() {
-        updateExampleData();
+        SDKConfig config = new SDKConfigBuilder()
+                .setSamsungPayServiceId("88399fbce50544e79ded9d")
+                .create();
+        PaymentkitManager.initialize(mActivity, serverType, config);
     }
 
     private void createPaymentResult(int resultCode, Intent data) {
@@ -167,6 +125,10 @@ public class GatewaySDKPresenter {
                             sb.append("OrderInfo.ChargeFee");
                             sb.append("\r\n");
                             sb.append(callbackData.getOrderInfo().getChargeFee());
+                            sb.append("\r\n");
+                            sb.append("OrderInfo.ProcessFee");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getOrderInfo().getProcessFee());
                             sb.append("\r\n");
                             sb.append("OrderInfo.TradeStatus");
                             sb.append("\r\n");
@@ -317,8 +279,28 @@ public class GatewaySDKPresenter {
                                 sb.append("\r\n");
                                 sb.append(callbackData.getBarcodeInfo().getBarcode3());
                             }
+                            if (callbackData.getCoBrandingInfo() != null) {
+                                sb.append("\r\n");
+                                sb.append("\r\n");
+                                sb.append("CoBrandingInfo Size：");
+                                sb.append(callbackData.getCoBrandingInfo().size());
+                                sb.append("\r\n");
+                                for (int i = 0; i < callbackData.getCoBrandingInfo().size(); i++) {
+                                    sb.append("CoBrandingInfo[");
+                                    sb.append(i);
+                                    sb.append("].CoBrandingCode");
+                                    sb.append("\r\n");
+                                    sb.append(callbackData.getCoBrandingInfo().get(i).CoBrandingCode);
+                                    sb.append("\r\n");
+                                    sb.append("CoBrandingInfo[");
+                                    sb.append(i);
+                                    sb.append("].Comment");
+                                    sb.append("\r\n");
+                                    sb.append(callbackData.getCoBrandingInfo().get(i).Comment);
+                                }
+                            }
 
-                            UIUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
+                            AlertUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
 
@@ -330,7 +312,7 @@ public class GatewaySDKPresenter {
                             sb.append("\r\n");
                             sb.append(callbackData.getRtnMsg());
 
-                            UIUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
+                            AlertUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
 
@@ -339,7 +321,7 @@ public class GatewaySDKPresenter {
                         }
                         break;
                     case Fail:
-                        UIUtil.showAlertDialog(mActivity, "提醒您", "Fail Code=" + callbackData.getRtnCode() + ", Msg=" + callbackData.getRtnMsg(), new DialogInterface.OnClickListener() {
+                        AlertUtil.showAlertDialog(mActivity, "提醒您", "Fail Code=" + callbackData.getRtnCode() + ", Msg=" + callbackData.getRtnMsg(), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -347,7 +329,7 @@ public class GatewaySDKPresenter {
                         }, "確定");
                         break;
                     case Cancel:
-                        UIUtil.showAlertDialog(mActivity, "提醒您", "交易取消", new DialogInterface.OnClickListener() {
+                        AlertUtil.showAlertDialog(mActivity, "提醒您", "交易取消", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -355,7 +337,7 @@ public class GatewaySDKPresenter {
                         }, "確定");
                         break;
                     case Exit:
-                        UIUtil.showAlertDialog(mActivity, "提醒您", "離開", new DialogInterface.OnClickListener() {
+                        AlertUtil.showAlertDialog(mActivity, "提醒您", "離開", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -392,293 +374,13 @@ public class GatewaySDKPresenter {
         }
     }
 
-    /**
-     * 模擬取得Token.
-     */
-    public void onSdkGetToken() {
-        switch (mModel.getTokenType.get()) {
-            case R.id.getTokenType1:
-                getTokenByTrade(2);
-                break;
-            case R.id.getTokenType2:
-                getTokenByTrade(1);
-                break;
-            case R.id.getTokenType3:
-                getTokenByTrade(0);
-                break;
-            case R.id.getTokenType4:
-                getTokenByUser();
-                break;
-        }
-    }
-
-    public void getTokenByTrade(int paymentUIType) {
-        final ProgressDialog progressDialog = UIUtil.createProgressDialog(mActivity);
-        progressDialog.show();
-        service.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    CallbackFunction<GetTokenByTradeInfoCallbackData> callback = new CallbackFunction<GetTokenByTradeInfoCallbackData>() {
-                        @Override
-                        public void callback(GetTokenByTradeInfoCallbackData callbackData) {
-                            try {
-                                if(callbackData.getCallbackStatus() ==
-                                        CallbackStatus.Success) {
-                                    if(callbackData.getRtnCode() == 1) {
-                                        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                                        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(mExampleData.getAesKey().getBytes(),
-                                                "AES"), new IvParameterSpec(mExampleData.getAesIv().getBytes()));
-                                        byte[] decBytes = cipher.doFinal(Base64.decode(callbackData.getData(), Base64.NO_WRAP));
-                                        String resJson = URLDecoder.decode(new String(decBytes));
-                                        Utility.log("resJson " + resJson);
-                                        DecData decData = new Gson().fromJson(resJson, DecData.class);
-                                        mActivity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                checkApiGetToken(decData);
-                                            }
-                                        });
-                                    } else {
-                                        mActivity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                UIUtil.showAlertDialog(mActivity, "提醒您", callbackData.getRtnMsg(), new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-
-                                                    }
-                                                }, "確定");
-                                            }
-                                        });
-                                    }
-                                }
-                            } catch (Exception ex) {
-                                Utility.exceptionLog(ex);
-                            }
-                        }
-                    };
-                    callApiGetTokenByTrade(paymentUIType, callback);
-                } catch (Exception ex) {
-                    Utility.exceptionLog(ex);
-                }
-                progressDialog.dismiss();
-            }
-        });
-    }
-
-    public void getTokenByUser() {
-        final ProgressDialog progressDialog = UIUtil.createProgressDialog(mActivity);
-        progressDialog.show();
-        service.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    CallbackFunction<GetTokenByUserInfoCallbackData> callback = new CallbackFunction<GetTokenByUserInfoCallbackData>() {
-                        @Override
-                        public void callback(GetTokenByUserInfoCallbackData callbackData) {
-                            try {
-                                if(callbackData.getCallbackStatus() ==
-                                        CallbackStatus.Success) {
-                                    if(callbackData.getRtnCode() == 1) {
-                                        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                                        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(mExampleData.getAesKey().getBytes(),
-                                                "AES"), new IvParameterSpec(mExampleData.getAesIv().getBytes()));
-                                        byte[] decBytes = cipher.doFinal(Base64.decode(callbackData.getData(), Base64.NO_WRAP));
-                                        String resJson = URLDecoder.decode(new String(decBytes));
-                                        Utility.log("resJson " + resJson);
-                                        DecData decData = new Gson().fromJson(resJson, DecData.class);
-                                        mActivity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                checkApiGetToken(decData);
-                                            }
-                                        });
-                                    } else {
-                                        mActivity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                UIUtil.showAlertDialog(mActivity, "提醒您", callbackData.getRtnMsg(), new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-
-                                                    }
-                                                }, "確定");
-                                            }
-                                        });
-                                    }
-                                }
-                            } catch (Exception ex) {
-                                Utility.exceptionLog(ex);
-                            }
-                        }
-                    };
-                    callApiGetTokenByUser(callback);
-                } catch (Exception ex) {
-                    Utility.exceptionLog(ex);
-                }
-                progressDialog.dismiss();
-            }
-        });
-    }
-
-    private void checkApiGetToken(DecData decData) {
-        if(decData.RtnCode == 1) {
-            mModel.token.set(decData.Token);
-        } else {
-            UIUtil.showAlertDialog(mActivity, "提醒您", decData.RtnMsg, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            }, "確定");
-            mModel.token.set("");
-        }
-    }
-
-    private void callApiGetTokenByTrade(int paymentUIType,
-                                        CallbackFunction<GetTokenByTradeInfoCallbackData> callback) throws Exception {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-        // 交易金額
-        int totalAmount = (mModel.totalAmountSwitch.get()!=null && mModel.totalAmountSwitch.get())? 20000 : 200;
-        // 信用卡紅利折抵
-        String redeem = (mModel.redeemSwitch.get()!=null && mModel.redeemSwitch.get())? "1" : "0";
-
-        OrderInfo orderInfo = new OrderInfo(
-                dateFormat.format(System.currentTimeMillis()),
-                String.valueOf(System.currentTimeMillis()),
-                totalAmount,
-                "https://www.ecpay.com.tw/",
-                "交易測試",
-                "測試商品");
-
-        CardInfo cardInfo = null;
-        UnionPayInfo unionPayInfo = null;
-        if(paymentUIType == 0) {
-            // 信用卡定期定額
-            cardInfo = new CardInfo(
-                    "https://www.ecpay.com.tw/",
-                    totalAmount,
-                    "M",
-                    3,
-                    5,
-                    "https://www.ecpay.com.tw/");
-        } else if(paymentUIType == 1) {
-            // 國旅卡
-            cardInfo = new CardInfo(
-                    redeem,
-                    "https://www.ecpay.com.tw/",
-                    "01012020",
-                    "01012029",
-                    "001");
-        } else if(paymentUIType == 2) {
-            // 付款選擇清單頁
-            cardInfo = new CardInfo(
-                    redeem,
-                    "https://www.ecpay.com.tw/",
-                    "3,6",
-                    "30");
-        }
-        unionPayInfo = new UnionPayInfo("https://www.ecpay.com.tw/");
-
-        ATMInfo atmInfo = new ATMInfo(
-                5);
-
-        CVSInfo cvsInfo = new CVSInfo(
-                10080,
-                "條碼一",
-                "條碼二",
-                "條碼三",
-                "條碼四");
-
-        BarcodeInfo barcodeInfo = new BarcodeInfo(
-                5);
-
-        ConsumerInfo consumerInfo = new ConsumerInfo(
-                mExampleData.getMerchantMemberID(),
-                mExampleData.getEmail(),
-                mExampleData.getPhone(),
-                mExampleData.getName(),
-                mExampleData.getCountryCode(),
-                mExampleData.getAddress());
-
-        GetTokenByTradeData getTokenByTradeData = new GetTokenByTradeData(
-                null,
-                mExampleData.getMerchantID(),
-                1,
-                paymentUIType,
-                "0",
-                orderInfo,
-                cardInfo,
-                atmInfo,
-                cvsInfo,
-                barcodeInfo,
-                consumerInfo,
-                unionPayInfo);
-
-        String data = new Gson().toJson(getTokenByTradeData);
-
-        Utility.log(data);
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(mExampleData.getAesKey().getBytes(),
-                "AES"), new IvParameterSpec(mExampleData.getAesIv().getBytes()));
-        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
-        String base64Data = Base64.encodeToString(encryptedBytes, Base64.NO_WRAP);
-
-        GetTokenByTradeInfo getTokenByTradeInfo = new GetTokenByTradeInfo();
-        getTokenByTradeInfo.setRqID(String.valueOf(System.currentTimeMillis()));
-        getTokenByTradeInfo.setRevision(mExampleData.getRevision());
-        getTokenByTradeInfo.setMerchantID(mExampleData.getMerchantID());
-        getTokenByTradeInfo.setData(base64Data);
-
-        PaymentkitManager.testGetTokenByTrade(mActivity,
-                getTokenByTradeInfo, callback);
-    }
-
-    private void callApiGetTokenByUser(CallbackFunction<GetTokenByUserInfoCallbackData> callback) throws Exception {
-
-        ConsumerInfo consumerInfo = new ConsumerInfo(
-                mExampleData.getMerchantMemberID(),
-                mExampleData.getEmail(),
-                mExampleData.getPhone(),
-                mExampleData.getName(),
-                mExampleData.getCountryCode(),
-                mExampleData.getAddress());
-
-        GetTokenByUserData getTokenByUserData = new GetTokenByUserData(
-                null,
-                mExampleData.getMerchantID(),
-                consumerInfo);
-
-        String data = new Gson().toJson(getTokenByUserData);
-
-        Utility.log(data);
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(mExampleData.getAesKey().getBytes(),
-                "AES"), new IvParameterSpec(mExampleData.getAesIv().getBytes()));
-        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
-        String base64Data = Base64.encodeToString(encryptedBytes, Base64.NO_WRAP);
-
-        GetTokenByUserInfo getTokenByUserInfo = new GetTokenByUserInfo();
-        getTokenByUserInfo.setRqID(String.valueOf(System.currentTimeMillis()));
-        getTokenByUserInfo.setRevision(mExampleData.getRevision());
-        getTokenByUserInfo.setMerchantID(mExampleData.getMerchantID());
-        getTokenByUserInfo.setData(base64Data);
-
-        PaymentkitManager.testGetTokenByUser(mActivity,
-                getTokenByUserInfo, callback);
-    }
-
     public void onPayment() {
         callSDKCreatePayment();
     }
 
     public void setTitleBarBackgroundColor(){
         boolean check = PaymentkitManager.setTitleBarBackgroundColor(mActivity, mModel.titleBarBackgroundColor.get());
-        UIUtil.showAlertDialog(mActivity, "提醒您", check ? "設定成功" : "設定失敗", new DialogInterface.OnClickListener() {
+        AlertUtil.showAlertDialog(mActivity, "提醒您", check ? "設定成功" : "設定失敗", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             }
@@ -716,7 +418,7 @@ public class GatewaySDKPresenter {
                         mModel.token.get(),
                         languageCode,
                         useResultPage,
-                        mExampleData.getAppStoreName(),
+                        appStoreName,
                         activityResultLauncher);
             } else {
                 PaymentkitManager.createPayment(mActivity,
@@ -724,14 +426,13 @@ public class GatewaySDKPresenter {
                         xmlMerchantID,
                         languageCode,
                         useResultPage,
-                        mExampleData.getAppStoreName(),
+                        appStoreName,
                         activityResultLauncher);
             }
         } else {
-            UIUtil.showAlertDialog(mActivity, "提醒您", "請輸入Token", new DialogInterface.OnClickListener() {
+            AlertUtil.showAlertDialog(mActivity, "提醒您", "請輸入Token", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-
                 }
             }, "確定");
         }

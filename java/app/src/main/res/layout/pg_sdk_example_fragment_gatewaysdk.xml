@@ -33,63 +33,26 @@
                 android:text="@{mModel.sdkVersion}"
                 android:textSize="17sp" />
 
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:checkedButton="@={mModel.getTokenType}">
-
-                <RadioButton
-                    android:id="@+id/getTokenType1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="模擬取得訂單Token(付款選擇頁)" />
-
-                <RadioButton
-                    android:id="@+id/getTokenType2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="模擬取得訂單Token(國旅卡)" />
-
-                <RadioButton
-                    android:id="@+id/getTokenType3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="模擬取得訂單Token(定期定額)" />
-
-                <RadioButton
-                    android:id="@+id/getTokenType4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="模擬取得UserToken" />
-            </RadioGroup>
-
-            <Switch
-                android:id="@+id/threeDSwitch"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checked="@={mModel.threeDSwitch}"
-                android:onClick="@{(view) -> mPresenter.onThreeDSwitch()}"
-                android:text="是否3D驗證" />
+                android:text="取得付款畫面"
+                android:textColor="@color/pg_sdk_black_000000"
+                android:textSize="26sp" />
 
-            <Switch
-                android:id="@+id/redeemSwitch"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checked="@={mModel.redeemSwitch}"
-                android:text="是否開啟信用卡紅利折抵" />
+                android:text="createPayment()"
+                android:textColor="@color/pg_sdk_red_e95663"
+                android:textSize="17sp" />
 
-            <Switch
-                android:id="@+id/totalAmountSwitch"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checked="@={mModel.totalAmountSwitch}"
-                android:text="是否大額訂單金額交易" />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="@{(view) -> mPresenter.onSdkGetToken()}"
-                android:text="模擬取得Token" />
+                android:text="1.廠商驗證碼"
+                android:textColor="@color/pg_sdk_black_000000"
+                android:textSize="19sp" />
 
             <EditText
                 android:layout_width="match_parent"
@@ -108,7 +71,7 @@
                 android:id="@+id/spinnerLanguage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:entries="@array/languageArray"
+                android:entries="@array/pg_sdk_example_languageArray"
                 android:selectedItemPosition="@={mModel.languageSelectedPosition}" />
 
             <LinearLayout
@@ -165,7 +128,7 @@
                 android:id="@+id/spinnerOrientation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:entries="@array/orientationArray" />
+                android:entries="@array/pg_sdk_example_orientationArray" />
 
             <Button
                 android:layout_width="match_parent"

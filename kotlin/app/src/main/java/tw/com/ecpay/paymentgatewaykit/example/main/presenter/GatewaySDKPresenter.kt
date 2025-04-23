@@ -3,66 +3,41 @@ package tw.com.ecpay.paymentgatewaykit.example.main.presenter
 import android.content.DialogInterface
 import android.content.Intent
 import android.text.TextUtils
-import android.util.Base64
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import tw.com.ecpay.paymentgatewaykit.example.R
-import tw.com.ecpay.paymentgatewaykit.example.api.ATMInfo
-import tw.com.ecpay.paymentgatewaykit.example.api.BarcodeInfo
-import tw.com.ecpay.paymentgatewaykit.example.api.CVSInfo
-import tw.com.ecpay.paymentgatewaykit.example.api.CardInfo
-import tw.com.ecpay.paymentgatewaykit.example.api.ConsumerInfo
-import tw.com.ecpay.paymentgatewaykit.example.api.DecData
-import tw.com.ecpay.paymentgatewaykit.example.api.GetTokenByTradeData
-import tw.com.ecpay.paymentgatewaykit.example.api.GetTokenByUserData
-import tw.com.ecpay.paymentgatewaykit.example.api.OrderInfo
-import tw.com.ecpay.paymentgatewaykit.example.api.UnionPayInfo
-import tw.com.ecpay.paymentgatewaykit.example.main.model.ExampleData
 import tw.com.ecpay.paymentgatewaykit.example.main.model.GatewaySDKModel
 import tw.com.ecpay.paymentgatewaykit.example.main.view.MainActivity
 import tw.com.ecpay.paymentgatewaykit.example.main.view.fragment.GatewaySDKFragment
-import tw.com.ecpay.paymentgatewaykit.example.util.UIUtil
-import tw.com.ecpay.paymentgatewaykit.example.util.Utility
+import tw.com.ecpay.paymentgatewaykit.example.util.AlertUtil
+import tw.com.ecpay.paymentgatewaykit.example.util.LogUtil
 import tw.com.ecpay.paymentgatewaykit.manager.CallbackFunction
 import tw.com.ecpay.paymentgatewaykit.manager.CallbackStatus
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfo
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByTradeInfoCallbackData
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfo
-import tw.com.ecpay.paymentgatewaykit.manager.GetTokenByUserInfoCallbackData
 import tw.com.ecpay.paymentgatewaykit.manager.LanguageCode
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentType
 import tw.com.ecpay.paymentgatewaykit.manager.PaymentkitManager
 import tw.com.ecpay.paymentgatewaykit.manager.ServerType
-import java.net.URLDecoder
-import java.text.SimpleDateFormat
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
-import kotlin.coroutines.EmptyCoroutineContext
 
 class GatewaySDKPresenter(
     private val mActivity: MainActivity,
     private val mFragment: GatewaySDKFragment,
     private val mModel: GatewaySDKModel,
-    private val mExampleData: ExampleData,
-    private val coroutineScope: CoroutineScope = CoroutineScope(EmptyCoroutineContext)
 ) {
 
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
+
+    private val appStoreName = "綠界測試商店"
 
     private fun registerForActivityResult() {
         activityResultLauncher =
             mFragment.registerForActivityResult(StartActivityForResult(),
                 ActivityResultCallback<ActivityResult> { result ->
-                    Utility.log("Activity ActivityResultCallback.onActivityResult(), resultCode:" + result.resultCode)
+                    LogUtil.log("Activity ActivityResultCallback.onActivityResult(), resultCode:" + result.resultCode)
                     createPaymentResult(result.resultCode, result.data)
-                })
+                }
+            )
     }
 
     fun init() {
@@ -70,10 +45,8 @@ class GatewaySDKPresenter(
         val serverType = ServerType.Stage
         val typeStr = "stage"
 
-        updateExampleData()
-
         mModel.description.set(
-            mActivity!!.getString(R.string.app_name) + " " + typeStr
+            "${mActivity.getString(R.string.app_name)} $typeStr"
         )
         mModel.sdkVersion.set(PaymentkitManager.getPaymentgatewaykitVersion())
 
@@ -82,24 +55,6 @@ class GatewaySDKPresenter(
 
     private fun sdkInit(serverType: ServerType) {
         PaymentkitManager.initialize(mActivity, serverType)
-    }
-
-    private fun updateExampleData() {
-        if (mModel.threeDSwitch.get() != null &&
-            mModel.threeDSwitch.get()!!
-        ) {
-            mExampleData.merchantID = "3002607"
-            mExampleData.aesKey = "pwFHCqoQZGmho4w6"
-            mExampleData.aesIv = "EkRm7iFT261dpevs"
-        } else {
-            mExampleData.merchantID = "2000132"
-            mExampleData.aesKey = "5294y06JbISpM5x9"
-            mExampleData.aesIv = "v77hoKGq4kWxNNIS"
-        }
-    }
-
-    fun onThreeDSwitch() {
-        updateExampleData()
     }
 
     fun createPaymentResult(resultCode: Int, data: Intent?) {
@@ -151,6 +106,10 @@ class GatewaySDKPresenter(
                         sb.append("OrderInfo.ChargeFee")
                         sb.append("\r\n")
                         sb.append(callbackData.orderInfo.chargeFee)
+                        sb.append("\r\n")
+                        sb.append("OrderInfo.ProcessFee")
+                        sb.append("\r\n")
+                        sb.append(callbackData.orderInfo.processFee)
                         sb.append("\r\n")
                         sb.append("OrderInfo.TradeStatus")
                         sb.append("\r\n")
@@ -307,7 +266,28 @@ class GatewaySDKPresenter(
                             sb.append("\r\n")
                             sb.append(callbackData.barcodeInfo.barcode3)
                         }
-                        UIUtil.showAlertDialog(
+                        if (callbackData.coBrandingInfo != null) {
+                            sb.append("\r\n")
+                            sb.append("\r\n")
+                            sb.append("CoBrandingInfo Size：")
+                            sb.append(callbackData.coBrandingInfo.size)
+                            sb.append("\r\n")
+                            for (i in 0 until callbackData.coBrandingInfo.size) {
+                                sb.append("CoBrandingInfo[")
+                                sb.append(i)
+                                sb.append("].CoBrandingCode")
+                                sb.append("\r\n")
+                                sb.append(callbackData.coBrandingInfo[i].CoBrandingCode)
+                                sb.append("\r\n")
+                                sb.append("CoBrandingInfo[")
+                                sb.append(i)
+                                sb.append("].Comment")
+                                sb.append("\r\n")
+                                sb.append(callbackData.coBrandingInfo[i].Comment)
+                            }
+                        }
+
+                        AlertUtil.showAlertDialog(
                             mActivity,
                             "提醒您",
                             sb.toString(),
@@ -319,7 +299,7 @@ class GatewaySDKPresenter(
                         sb.append(callbackData.rtnCode)
                         sb.append("\r\n")
                         sb.append(callbackData.rtnMsg)
-                        UIUtil.showAlertDialog(
+                        AlertUtil.showAlertDialog(
                             mActivity,
                             "提醒您",
                             sb.toString(),
@@ -328,7 +308,7 @@ class GatewaySDKPresenter(
                         )
                     }
                     CallbackStatus.Fail -> {
-                        UIUtil.showAlertDialog(
+                        AlertUtil.showAlertDialog(
                             mActivity,
                             "提醒您",
                             "Fail Code=" + callbackData.rtnCode +
@@ -337,14 +317,14 @@ class GatewaySDKPresenter(
                             "確定"
                         )
                     }
-                    CallbackStatus.Cancel -> UIUtil.showAlertDialog(
+                    CallbackStatus.Cancel -> AlertUtil.showAlertDialog(
                         mActivity,
                         "提醒您",
                         "交易取消",
                         DialogInterface.OnClickListener { dialog, which -> },
                         "確定"
                     )
-                    CallbackStatus.Exit -> UIUtil.showAlertDialog(
+                    CallbackStatus.Exit -> AlertUtil.showAlertDialog(
                         mActivity,
                         "提醒您",
                         "離開",
@@ -372,321 +352,6 @@ class GatewaySDKPresenter(
         }
     }
 
-    fun onSdkGetToken() {
-        when (mModel.getTokenType.get()) {
-            R.id.getTokenType1 -> getTokenByTrade(2)
-            R.id.getTokenType2 -> getTokenByTrade(1)
-            R.id.getTokenType3 -> getTokenByTrade(0)
-            R.id.getTokenType4 -> getTokenByUser()
-        }
-    }
-
-    fun getTokenByTrade(paymentUIType: Int) {
-        val progressDialog = UIUtil.createProgressDialog(mActivity)
-        progressDialog!!.show()
-        coroutineScope.launch(Dispatchers.IO) {
-            try {
-                val callback =
-                    CallbackFunction<GetTokenByTradeInfoCallbackData> { callbackData ->
-                        try {
-                            if (callbackData.callbackStatus ==
-                                CallbackStatus.Success
-                            ) {
-                                if (callbackData.rtnCode == 1) {
-                                    val cipher: Cipher =
-                                        Cipher.getInstance("AES/CBC/PKCS5Padding")
-                                    cipher.init(
-                                        Cipher.DECRYPT_MODE, SecretKeySpec(
-                                            mExampleData.aesKey.toByteArray(),
-                                            "AES"
-                                        ), IvParameterSpec(mExampleData.aesIv.toByteArray())
-                                    )
-                                    val decBytes: ByteArray = cipher.doFinal(
-                                        Base64.decode(
-                                            callbackData.data,
-                                            Base64.NO_WRAP
-                                        )
-                                    )
-                                    val resJson: String =
-                                        URLDecoder.decode(String(decBytes))
-                                    Utility.log("resJson $resJson")
-                                    val decData = Gson().fromJson(
-                                        resJson,
-                                        DecData::class.java
-                                    )
-                                    coroutineScope.launch(Dispatchers.Main) {
-                                        checkApiGetToken(decData)
-                                    }
-                                } else {
-                                    coroutineScope.launch(Dispatchers.Main) {
-                                        UIUtil.showAlertDialog(
-                                            mActivity,
-                                            "提醒您",
-                                            callbackData.getRtnMsg(),
-                                            DialogInterface.OnClickListener { dialog, which -> },
-                                            "確定"
-                                        )
-                                    }
-                                }
-                            }
-                        } catch (ex: Exception) {
-                            Utility.exceptionLog(ex)
-                        }
-                    }
-                callApiGetTokenByTrade(paymentUIType, callback)
-            } catch (ex: Exception) {
-                Utility.exceptionLog(ex)
-            }
-            progressDialog!!.dismiss()
-        }
-    }
-
-    fun getTokenByUser() {
-        val progressDialog = UIUtil.createProgressDialog(mActivity)
-        progressDialog!!.show()
-        coroutineScope.launch(Dispatchers.IO) {
-            try {
-                val callback =
-                    CallbackFunction<GetTokenByUserInfoCallbackData> { callbackData ->
-                        try {
-                            if (callbackData.callbackStatus ==
-                                CallbackStatus.Success
-                            ) {
-                                if (callbackData.rtnCode == 1) {
-                                    val cipher =
-                                        Cipher.getInstance("AES/CBC/PKCS5Padding")
-                                    cipher.init(
-                                        Cipher.DECRYPT_MODE,
-                                        SecretKeySpec(
-                                            mExampleData.aesKey.toByteArray(),
-                                            "AES"
-                                        ),
-                                        IvParameterSpec(mExampleData.aesIv.toByteArray())
-                                    )
-                                    val decBytes = cipher.doFinal(
-                                        Base64.decode(
-                                            callbackData.data,
-                                            Base64.NO_WRAP
-                                        )
-                                    )
-                                    val resJson =
-                                        URLDecoder.decode(String(decBytes))
-                                    Utility.log("resJson $resJson")
-                                    val decData = Gson().fromJson(
-                                        resJson,
-                                        DecData::class.java
-                                    )
-                                    coroutineScope.launch(Dispatchers.Main) {
-                                        checkApiGetToken(decData)
-                                    }
-                                } else {
-                                    coroutineScope.launch(Dispatchers.Main) {
-                                        UIUtil.showAlertDialog(
-                                            mActivity,
-                                            "提醒您",
-                                            callbackData.getRtnMsg(),
-                                            DialogInterface.OnClickListener { dialog, which -> },
-                                            "確定"
-                                        )
-                                    }
-                                }
-                            }
-                        } catch (ex: java.lang.Exception) {
-                            Utility.exceptionLog(ex)
-                        }
-                    }
-                callApiGetTokenByUser(callback)
-            } catch (ex: java.lang.Exception) {
-                Utility.exceptionLog(ex)
-            }
-            progressDialog!!.dismiss()
-        }
-    }
-
-    fun checkApiGetToken(decData: DecData) {
-        if (decData.RtnCode === 1) {
-            mModel.token.set(decData.Token)
-        } else {
-            UIUtil.showAlertDialog(
-                mActivity,
-                "提醒您",
-                decData.RtnMsg,
-                DialogInterface.OnClickListener { dialog, which -> },
-                "確定"
-            )
-            mModel.token.set("")
-        }
-    }
-
-    private fun callApiGetTokenByTrade(
-        paymentUIType: Int,
-        callback: CallbackFunction<GetTokenByTradeInfoCallbackData>
-    ) {
-        val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
-
-        // 交易金額
-        val totalAmount = if (mModel.totalAmountSwitch.get() != null && mModel.totalAmountSwitch.get()!!) 20000 else 200
-        // 信用卡紅利折抵
-        val redeem = if (mModel.redeemSwitch.get() != null && mModel.redeemSwitch.get()!!) "1" else "0"
-
-        val orderInfo = OrderInfo(
-            dateFormat.format(System.currentTimeMillis()),
-            System.currentTimeMillis().toString(),
-            totalAmount,
-            "https://www.ecpay.com.tw/",
-            "交易測試",
-            "測試商品"
-        )
-
-        var cardInfo: CardInfo? = null
-        var unionPayInfo: UnionPayInfo? = null
-        when(paymentUIType) {
-            0 -> {
-                // 信用卡定期定額
-                cardInfo = CardInfo(
-                    "https://www.ecpay.com.tw/",
-                    totalAmount,
-                    "M",
-                    3,
-                    5,
-                    "https://www.ecpay.com.tw/"
-                )
-            }
-            1 -> {
-                // 國旅卡
-                cardInfo = CardInfo(
-                    redeem,
-                    "https://www.ecpay.com.tw/",
-                    "01012020",
-                    "01012029",
-                    "001"
-                )
-            }
-            2 -> {
-                // 付款選擇清單頁
-                cardInfo = CardInfo(
-                    redeem,
-                    "https://www.ecpay.com.tw/",
-                    "3,6",
-                    "30"
-                )
-            }
-        }
-
-        unionPayInfo = UnionPayInfo(
-            "https://www.ecpay.com.tw/"
-        )
-
-        val atmInfo = ATMInfo(
-            5
-        )
-
-        val cvsInfo = CVSInfo(
-            10080,
-            "條碼一",
-            "條碼二",
-            "條碼三",
-            "條碼四"
-        )
-
-        val barcodeInfo = BarcodeInfo(
-            5
-        )
-
-        val consumerInfo = ConsumerInfo(
-            mExampleData.merchantMemberID,
-            mExampleData.email,
-            mExampleData.phone,
-            mExampleData.name,
-            mExampleData.countryCode,
-            mExampleData.address
-        )
-
-        val getTokenByTradeData = GetTokenByTradeData(
-            null,
-            mExampleData.merchantID,
-            1,
-            paymentUIType,
-            "0",
-            orderInfo,
-            cardInfo,
-            atmInfo,
-            cvsInfo,
-            barcodeInfo,
-            consumerInfo,
-            unionPayInfo
-        )
-
-        val data = Gson().toJson(getTokenByTradeData)
-
-        Utility.log(data)
-
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-        cipher.init(
-            Cipher.ENCRYPT_MODE, SecretKeySpec(
-                mExampleData.aesKey.toByteArray(),
-                "AES"
-            ), IvParameterSpec(mExampleData.aesIv.toByteArray())
-        )
-        val encryptedBytes = cipher.doFinal(data.toByteArray())
-        val base64Data =
-            Base64.encodeToString(encryptedBytes, Base64.NO_WRAP)
-
-        val getTokenByTradeInfo = GetTokenByTradeInfo()
-        getTokenByTradeInfo.rqID = System.currentTimeMillis().toString()
-        getTokenByTradeInfo.revision = mExampleData.revision
-        getTokenByTradeInfo.merchantID = mExampleData.merchantID
-        getTokenByTradeInfo.data = base64Data
-
-        PaymentkitManager.testGetTokenByTrade(
-            mActivity,
-            getTokenByTradeInfo, callback
-        )
-    }
-
-    private fun callApiGetTokenByUser(callback: CallbackFunction<GetTokenByUserInfoCallbackData>) {
-        val consumerInfo = ConsumerInfo(
-            mExampleData.merchantMemberID,
-            mExampleData.email,
-            mExampleData.phone,
-            mExampleData.name,
-            mExampleData.countryCode,
-            mExampleData.address
-        )
-
-        val getTokenByUserData = GetTokenByUserData(
-            null,
-            mExampleData.merchantID,
-            consumerInfo
-        )
-
-        val data = Gson().toJson(getTokenByUserData)
-
-        Utility.log(data)
-
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-        cipher.init(
-            Cipher.ENCRYPT_MODE, SecretKeySpec(
-                mExampleData.aesKey.toByteArray(),
-                "AES"
-            ), IvParameterSpec(mExampleData.aesIv.toByteArray())
-        )
-        val encryptedBytes = cipher.doFinal(data.toByteArray())
-        val base64Data =
-            Base64.encodeToString(encryptedBytes, Base64.NO_WRAP)
-
-        val getTokenByUserInfo = GetTokenByUserInfo()
-        getTokenByUserInfo.rqID = System.currentTimeMillis().toString()
-        getTokenByUserInfo.revision = mExampleData.revision
-        getTokenByUserInfo.merchantID = mExampleData.merchantID
-        getTokenByUserInfo.data = base64Data
-
-        PaymentkitManager.testGetTokenByUser(
-            mActivity,
-            getTokenByUserInfo, callback
-        )
-    }
-
     fun onPayment() {
         callSDKCreatePayment()
     }
@@ -696,7 +361,7 @@ class GatewaySDKPresenter(
             mActivity,
             mModel.titleBarBackgroundColor.get()
         )
-        UIUtil.showAlertDialog(mActivity, "提醒您", if (check) "設定成功" else "設定失敗",
+        AlertUtil.showAlertDialog(mActivity, "提醒您", if (check) "設定成功" else "設定失敗",
             { dialog, which -> }, "確定"
         )
     }
@@ -726,7 +391,7 @@ class GatewaySDKPresenter(
                     mModel.token.get() ?: "",
                     languageCode,
                     useResultPage,
-                    mExampleData.appStoreName,
+                    appStoreName,
                     activityResultLauncher
                 )
             } else {
@@ -736,12 +401,12 @@ class GatewaySDKPresenter(
                     xmlMerchantID ?: "",
                     languageCode,
                     useResultPage,
-                    mExampleData.appStoreName,
+                    appStoreName,
                     activityResultLauncher
                 )
             }
         } else {
-            UIUtil.showAlertDialog(
+            AlertUtil.showAlertDialog(
                 mActivity,
                 "提醒您",
                 "請輸入Token",

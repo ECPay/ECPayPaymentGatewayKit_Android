@@ -1,14 +1,16 @@
 plugins {
-    id 'com.android.application'
+    alias libs.plugins.android.application
 }
 
 android {
-    compileSdk rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    namespace 'tw.com.ecpay.paymentgatewaykit.example'
+    compileSdk libs.versions.compileSdkVersion.get().toInteger()
+    buildToolsVersion libs.versions.buildToolsVersion.get()
 
-    flavorDimensions "default"
+    flavorDimensions = ["default"]
 
     buildFeatures {
+        buildConfig true
         dataBinding true
     }
 
@@ -31,10 +33,10 @@ android {
 
     defaultConfig {
         applicationId "tw.com.ecpay.paymentgatewaykit.gateway.example"
-        minSdk rootProject.ext.minSdkVersion
-        targetSdk rootProject.ext.targetSdkVersion
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
+        minSdk libs.versions.minSdkVersion.get().toInteger()
+        targetSdk libs.versions.targetSdkVersion.get().toInteger()
+        versionCode 1
+        versionName "1.0.0"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
@@ -53,37 +55,43 @@ android {
         }
     }
 
-    packagingOptions {
-        exclude 'META-INF/*.version'
-        exclude 'META-INF/*.kotlin_module'
+    packaging {
+        resources {
+            it.excludes += 'META-INF/*.version'
+            it.excludes += 'META-INF/*.kotlin_module'
 
-        exclude 'kotlin/**'
-        exclude 'okhttp3/**'
-        exclude '/*.properties'
+            it.excludes += 'kotlin/**'
+            it.excludes += 'okhttp3/**'
+            it.excludes += '/*.properties'
+        }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 dependencies {
-    implementation "androidx.appcompat:appcompat:${rootProject.ext.androidxAppcompatLibVersion}"
+    // Jetpack AndroidX
+    implementation libs.androidx.core
+    implementation libs.androidx.activity
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.constraintlayout
+    // Google Lib
+    implementation libs.google.material
+    implementation libs.google.gson
+    implementation libs.zxing.core
+    // Lib
+    implementation libs.squareup.okhttp3.okhttp
+    implementation libs.squareup.okhttp3.logging
+    implementation libs.squareup.retrofit2.retrofit
+    implementation libs.squareup.retrofit2.converter.gson
+    // Sdk
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.7.0'
 
-    implementation "com.google.android.material:material:${rootProject.ext.materialLibVersion}"
-    implementation "com.google.code.gson:gson:${rootProject.ext.gsonLibVersion}"
-    implementation "com.google.zxing:core:${rootProject.ext.zxingCoreLibVersion}"
+    testImplementation libs.junit4
 
-    implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3LibVersion}"
-    implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.okhttp3LibVersion}"
-    implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.retrofit2LibVersion}"
-    implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.retrofit2LibVersion}"
-
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.6.0'
-
-    testImplementation 'junit:junit:4.13.2'
-
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.androidx.test.espresso.core
 }

@@ -2,11 +2,11 @@ package tw.com.ecpay.paymentgatewaykit.example.util;
 
 import android.util.Log;
 
-public class Utility {
+public class LogUtil {
 
     private static final String TAG = "ECPayPaymentGatewayKit_Example";
 
-    private Utility() {
+    private LogUtil() {
     }
 
     /**

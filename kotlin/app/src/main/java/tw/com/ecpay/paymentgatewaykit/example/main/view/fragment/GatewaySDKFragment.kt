@@ -10,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import tw.com.ecpay.paymentgatewaykit.example.R
 import tw.com.ecpay.paymentgatewaykit.example.databinding.PgSdkExampleFragmentGatewaysdkBinding
-import tw.com.ecpay.paymentgatewaykit.example.main.model.ExampleData
 import tw.com.ecpay.paymentgatewaykit.example.main.model.GatewaySDKModel
 import tw.com.ecpay.paymentgatewaykit.example.main.presenter.GatewaySDKPresenter
 import tw.com.ecpay.paymentgatewaykit.example.main.view.MainActivity
@@ -32,8 +31,6 @@ class GatewaySDKFragment : Fragment() {
 
     private lateinit var mPresenter: GatewaySDKPresenter
 
-    private lateinit var mExampleData: ExampleData
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -44,11 +41,9 @@ class GatewaySDKFragment : Fragment() {
             R.layout.pg_sdk_example_fragment_gatewaysdk,
             container, false)
         mModel = GatewaySDKModel()
-        mExampleData = ExampleData()
         mPresenter = GatewaySDKPresenter(requireActivity() as MainActivity,
             this,
             mModel,
-            mExampleData
         )
 
         binding.mModel = mModel

@@ -2,7 +2,7 @@ package tw.com.ecpay.paymentgatewaykit.example.util
 
 import android.util.Log
 
-class Utility {
+class LogUtil {
 
     companion object {
 

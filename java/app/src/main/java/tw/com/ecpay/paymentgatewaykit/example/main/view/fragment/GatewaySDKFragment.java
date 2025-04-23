@@ -11,22 +11,19 @@ import androidx.fragment.app.Fragment;
 
 import tw.com.ecpay.paymentgatewaykit.example.R;
 import tw.com.ecpay.paymentgatewaykit.example.databinding.PgSdkExampleFragmentGatewaysdkBinding;
-import tw.com.ecpay.paymentgatewaykit.example.main.model.ExampleData;
 import tw.com.ecpay.paymentgatewaykit.example.main.model.GatewaySDKModel;
 import tw.com.ecpay.paymentgatewaykit.example.main.presenter.GatewaySDKPresenter;
 import tw.com.ecpay.paymentgatewaykit.example.main.view.MainActivity;
 
 public class GatewaySDKFragment extends Fragment {
 
-    public static final String FragmentTagName = GatewaySDKFragment.class.getName();
+    public static final String FRAGMENT_TAG_NAME = GatewaySDKFragment.class.getName();
 
     private PgSdkExampleFragmentGatewaysdkBinding binding;
 
     private GatewaySDKModel mModel;
 
     private GatewaySDKPresenter mPresenter;
-
-    private ExampleData mExampleData;
 
     public static GatewaySDKFragment newInstance() {
         GatewaySDKFragment gatewaySDKFragment = new GatewaySDKFragment();
@@ -42,9 +39,10 @@ public class GatewaySDKFragment extends Fragment {
                 R.layout.pg_sdk_example_fragment_gatewaysdk,
                 container, false);
         mModel = new GatewaySDKModel();
-        mExampleData = new ExampleData();
-        mPresenter = new GatewaySDKPresenter((MainActivity)getActivity(), this,
-                mModel, mExampleData);
+        mPresenter = new GatewaySDKPresenter(
+                (MainActivity) requireActivity(),
+                this,
+                mModel);
         binding.setMModel(mModel);
         binding.setMPresenter(mPresenter);
 

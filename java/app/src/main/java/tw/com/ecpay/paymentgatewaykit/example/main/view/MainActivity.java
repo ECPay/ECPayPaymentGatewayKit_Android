@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frameLayout,
                         GatewaySDKFragment.newInstance(),
-                        GatewaySDKFragment.FragmentTagName)
+                        GatewaySDKFragment.FRAGMENT_TAG_NAME)
                 .commit();
     }
 }

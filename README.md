@@ -40,8 +40,8 @@ android {
 
 ````gradle
 dependencies {
-	implementation 'androidx.core:core:1.13.1'
-	implementation 'androidx.activity:activity:1.8.2'
+    implementation 'androidx.core:core:1.13.1'
+    implementation 'androidx.activity:activity:1.8.2'
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     

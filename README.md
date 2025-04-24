@@ -174,6 +174,10 @@ private void createPaymentResult(int resultCode, Intent data) {
                         sb.append("\r\n");
                         sb.append(callbackData.getOrderInfo().getChargeFee());
                         sb.append("\r\n");
+                        sb.append("OrderInfo.ProcessFee");
+                        sb.append("\r\n");
+                        sb.append(callbackData.getOrderInfo().getProcessFee());
+                        sb.append("\r\n");
                         sb.append("OrderInfo.TradeStatus");
                         sb.append("\r\n");
                         sb.append(callbackData.getOrderInfo().getTradeStatus());
@@ -323,8 +327,28 @@ private void createPaymentResult(int resultCode, Intent data) {
                             sb.append("\r\n");
                             sb.append(callbackData.getBarcodeInfo().getBarcode3());
                         }
+                        if (callbackData.getCoBrandingInfo() != null) {
+                            sb.append("\r\n");
+                            sb.append("\r\n");
+                            sb.append("CoBrandingInfo Size：");
+                            sb.append(callbackData.getCoBrandingInfo().size());
+                            sb.append("\r\n");
+                            for (int i = 0; i < callbackData.getCoBrandingInfo().size(); i++) {
+                                sb.append("CoBrandingInfo[");
+                                sb.append(i);
+                                sb.append("].CoBrandingCode");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCoBrandingInfo().get(i).CoBrandingCode);
+                                sb.append("\r\n");
+                                sb.append("CoBrandingInfo[");
+                                sb.append(i);
+                                sb.append("].Comment");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getCoBrandingInfo().get(i).Comment);
+                            }
+                        }
 
-                        UIUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
+                        AlertUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -336,7 +360,7 @@ private void createPaymentResult(int resultCode, Intent data) {
                         sb.append("\r\n");
                         sb.append(callbackData.getRtnMsg());
 
-                        UIUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
+                        AlertUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -345,7 +369,7 @@ private void createPaymentResult(int resultCode, Intent data) {
                     }
                     break;
                 case Fail:
-                    UIUtil.showAlertDialog(mActivity, "提醒您", "Fail Code=" + callbackData.getRtnCode() + ", Msg=" + callbackData.getRtnMsg(), new DialogInterface.OnClickListener() {
+                    AlertUtil.showAlertDialog(mActivity, "提醒您", "Fail Code=" + callbackData.getRtnCode() + ", Msg=" + callbackData.getRtnMsg(), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -353,7 +377,7 @@ private void createPaymentResult(int resultCode, Intent data) {
                     }, "確定");
                     break;
                 case Cancel:
-                    UIUtil.showAlertDialog(mActivity, "提醒您", "交易取消", new DialogInterface.OnClickListener() {
+                    AlertUtil.showAlertDialog(mActivity, "提醒您", "交易取消", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -361,7 +385,7 @@ private void createPaymentResult(int resultCode, Intent data) {
                     }, "確定");
                     break;
                 case Exit:
-                    UIUtil.showAlertDialog(mActivity, "提醒您", "離開", new DialogInterface.OnClickListener() {
+                    AlertUtil.showAlertDialog(mActivity, "提醒您", "離開", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 

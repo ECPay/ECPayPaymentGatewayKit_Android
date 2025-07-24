@@ -99,7 +99,7 @@ dependencies {
     implementation(libs.squareup.retrofit2.retrofit)
     implementation(libs.squareup.retrofit2.converter.gson)
     // Sdk
-    implementation("tw.com.ecpay:ECPayPaymentGatewayKit:1.7.0")
+    implementation("tw.com.ecpay:ECPayPaymentGatewayKit:1.8.0")
 
     testImplementation(libs.junit4)
 

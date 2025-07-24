@@ -17,9 +17,9 @@
 ## Requirements
 
 - Java JDK `17`
-- Android Gradle Plugin `8.2.2` (Android Studio Hedgehog | 2023.1.1 Patch 2)
+- Android Gradle Plugin `8.5.2` (Android Studio Koala | 2024.1.1 Patch 2)
 - minSdkVersion `21` (Android 5.0)
-- targetSdkVersion `34` (Android 14.0)
+- targetSdkVersion `35` (Android 15.0)
 
 ##  Installation
 
@@ -55,7 +55,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.7.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.8.0'
 }
 
 ````

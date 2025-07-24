@@ -1,10 +1,10 @@
 [versions]
-compileSdkVersion = "34"
-buildToolsVersion = "34.0.0"
+compileSdkVersion = "35"
+buildToolsVersion = "35.0.0"
 minSdkVersion = "21"
-targetSdkVersion = "34"
+targetSdkVersion = "35"
 
-androidGradlePluginVersion = "8.2.2"
+androidGradlePluginVersion = "8.5.2"
 
 kotlinVersion = "1.9.25"
 

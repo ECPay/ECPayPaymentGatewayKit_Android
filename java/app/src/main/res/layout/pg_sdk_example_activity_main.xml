@@ -9,18 +9,65 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
+        <RelativeLayout
             android:id="@+id/top_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@color/pg_sdk_example_black_000000" />
+            android:background="@color/pg_sdk_example_black_000000">
 
-        <FrameLayout
-            android:id="@+id/frameLayout"
+            <View
+                android:id="@+id/top_left_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@color/pg_sdk_example_black_000000" />
+
+            <View
+                android:id="@+id/top_right_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:background="@color/pg_sdk_example_black_000000" />
+
+            <View
+                android:id="@+id/top_middle_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@+id/top_right_view"
+                android:layout_toEndOf="@+id/top_left_view" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/bottom_view"
-            android:layout_below="@+id/top_view" />
+            android:layout_below="@id/top_view">
+
+            <View
+                android:id="@+id/left_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@color/pg_sdk_example_black_000000" />
+
+            <View
+                android:id="@+id/right_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:background="@color/pg_sdk_example_black_000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@+id/right_view"
+                android:layout_toEndOf="@+id/left_view"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:id="@+id/frameLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <View
             android:id="@+id/bottom_view"

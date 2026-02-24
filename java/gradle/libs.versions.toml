@@ -1,14 +1,15 @@
 [versions]
-compileSdkVersion = "35"
-buildToolsVersion = "35.0.0"
+compileSdkVersion = "36"
+compileSdkMinorVersion = "0"
+buildToolsVersion = "36.0.0"
 minSdkVersion = "21"
-targetSdkVersion = "35"
+targetSdkVersion = "36"
 
-androidGradlePluginVersion = "8.5.2"
+androidGradlePluginVersion = "8.10.1"
 
 androidxCoreLibVersion = "1.13.1"
 androidxActivityLibVersion = "1.8.2"
-androidxAppcompatLibVersion = "1.3.0"
+androidxAppcompatLibVersion = "1.5.1"
 androidxConstraintlayoutLibVersion = "2.1.4"
 
 googleMaterialLibVersion = "1.1.0"
@@ -23,8 +24,8 @@ zxingCoreLibVersion = "3.3.0"
 
 junit4LibVersion = "4.13.2"
 
-androidxTestExtJUnitLibVersion = "1.1.5"
-androidxTestEspressoCoreLibVersion = "3.5.1"
+androidxTestExtJUnitLibVersion = "1.3.0"
+androidxTestEspressoCoreLibVersion = "3.7.0"
 
 [libraries]
 androidx-core = { group = "androidx.core", name = "core", version.ref = "androidxCoreLibVersion" }

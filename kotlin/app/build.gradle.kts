@@ -63,9 +63,7 @@ android {
         resources {
             excludes += listOf(
                 "META-INF/*.version",
-                "META-INF/*.kotlin_module",
-                "kotlin/**",
-                "okhttp3/**",
+
                 "/*.properties"
             )
         }
@@ -99,7 +97,7 @@ dependencies {
     implementation(libs.squareup.retrofit2.retrofit)
     implementation(libs.squareup.retrofit2.converter.gson)
     // Sdk
-    implementation("tw.com.ecpay:ECPayPaymentGatewayKit:1.8.0")
+    implementation("tw.com.ecpay:ECPayPaymentGatewayKit:1.9.0")
 
     testImplementation(libs.junit4)
 

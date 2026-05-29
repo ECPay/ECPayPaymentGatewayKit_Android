@@ -286,6 +286,21 @@ class GatewaySDKPresenter(
                                 sb.append(callbackData.coBrandingInfo[i].Comment)
                             }
                         }
+                        if (callbackData.getBnplInfo() != null) {
+                            sb.append("\r\n")
+                            sb.append("\r\n")
+                            sb.append("BnplInfo.Installment")
+                            sb.append("\r\n")
+                            sb.append(callbackData.bnplInfo.installment)
+                            sb.append("\r\n")
+                            sb.append("BnplInfo.ChooseSubPayment")
+                            sb.append("\r\n")
+                            sb.append(callbackData.bnplInfo.chooseSubPayment)
+                            sb.append("\r\n")
+                            sb.append("BnplInfo.BNPLTradeNo")
+                            sb.append("\r\n")
+                            sb.append(callbackData.bnplInfo.bnplTradeNo)
+                        }
 
                         AlertUtil.showAlertDialog(
                             mActivity,
@@ -347,7 +362,8 @@ class GatewaySDKPresenter(
             PaymentType.PeriodicFixedAmount -> "信用卡定期定額"
             PaymentType.NationalTravelCard -> "國旅卡"
             PaymentType.UnionPay -> "銀聯卡"
-            PaymentType.FlexibleInstallment -> "信用卡圓夢分期"
+            PaymentType.FlexibleInstallment -> "永豐 30 期"
+            PaymentType.BNPL -> "無卡分期"
             else -> ""
         }
     }

@@ -299,6 +299,21 @@ public class GatewaySDKPresenter {
                                     sb.append(callbackData.getCoBrandingInfo().get(i).Comment);
                                 }
                             }
+                            if(callbackData.getBnplInfo() != null) {
+                                sb.append("\r\n");
+                                sb.append("\r\n");
+                                sb.append("BnplInfo.Installment");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getBnplInfo().getInstallment());
+                                sb.append("\r\n");
+                                sb.append("BnplInfo.ChooseSubPayment");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getBnplInfo().getChooseSubPayment());
+                                sb.append("\r\n");
+                                sb.append("BnplInfo.BNPLTradeNo");
+                                sb.append("\r\n");
+                                sb.append(callbackData.getBnplInfo().getBNPLTradeNo());
+                            }
 
                             AlertUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
                                 @Override
@@ -368,7 +383,9 @@ public class GatewaySDKPresenter {
             case UnionPay:
                 return "銀聯卡";
             case FlexibleInstallment:
-                return "信用卡圓夢分期";
+                return "永豐 30 期";
+            case BNPL:
+                return "無卡分期";
             default:
                 return "";
         }

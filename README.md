@@ -55,7 +55,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.9.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.10.0'
 }
 
 ````
@@ -347,6 +347,21 @@ private void createPaymentResult(int resultCode, Intent data) {
                                 sb.append(callbackData.getCoBrandingInfo().get(i).Comment);
                             }
                         }
+                        if(callbackData.getBnplInfo() != null) {
+                            sb.append("\r\n");
+                            sb.append("\r\n");
+                            sb.append("BnplInfo.Installment");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getBnplInfo().getInstallment());
+                            sb.append("\r\n");
+                            sb.append("BnplInfo.ChooseSubPayment");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getBnplInfo().getChooseSubPayment());
+                            sb.append("\r\n");
+                            sb.append("BnplInfo.BNPLTradeNo");
+                            sb.append("\r\n");
+                            sb.append(callbackData.getBnplInfo().getBNPLTradeNo());
+                        }
 
                         AlertUtil.showAlertDialog(mActivity, "提醒您", sb.toString(), new DialogInterface.OnClickListener() {
                             @Override
@@ -432,4 +447,4 @@ callback 包含以下狀態
 
 ## License
 
-Copyright © 1996-2021 Green World FinTech Service Co., Ltd. All rights reserved. 
+Copyright © 1996-2026 Green World FinTech Service Co., Ltd. All rights reserved. 

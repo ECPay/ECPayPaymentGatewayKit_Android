@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -5,7 +7,13 @@ plugins {
 
 android {
     namespace = "tw.com.ecpay.paymentgatewaykit.example"
-    compileSdk = libs.versions.compileSdkVersion.get().toInt()
+    compileSdk {
+        version = release(libs.versions.compileSdkVersion.get().toInt()) {
+            if (libs.versions.compileSdkMinorVersion.get().toInt() > 0) {
+                minorApiLevel = libs.versions.compileSdkMinorVersion.get().toInt()
+            }
+        }
+    }
     buildToolsVersion = libs.versions.buildToolsVersion.get()
 
     flavorDimensions.addAll(mutableListOf("default"))
@@ -74,8 +82,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
 }
 
@@ -97,7 +107,7 @@ dependencies {
     implementation(libs.squareup.retrofit2.retrofit)
     implementation(libs.squareup.retrofit2.converter.gson)
     // Sdk
-    implementation("tw.com.ecpay:ECPayPaymentGatewayKit:1.10.0")
+    implementation("tw.com.ecpay:ECPayPaymentGatewayKit:1.11.0")
 
     testImplementation(libs.junit4)
 

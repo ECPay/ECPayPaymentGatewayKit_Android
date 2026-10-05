@@ -17,7 +17,7 @@
 ## Requirements
 
 - Java JDK `17`
-- Android Gradle Plugin `8.10.1` (Android Studio Meerkat Feature Drop | 2024.3.2 Patch 1)
+- Android Gradle Plugin `8.13.2` (Android Studio Narwhal 3 Feature Drop | 2025.1.3)
 - minSdkVersion `21` (Android 5.0)
 - targetSdkVersion `36` (Android 16.0)
 
@@ -55,7 +55,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // ECPay Payment SDK
-    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.10.0'
+    implementation 'tw.com.ecpay:ECPayPaymentGatewayKit:1.11.0'
 }
 
 ````

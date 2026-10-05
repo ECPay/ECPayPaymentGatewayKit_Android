@@ -5,7 +5,7 @@ buildToolsVersion = "36.0.0"
 minSdkVersion = "21"
 targetSdkVersion = "36"
 
-androidGradlePluginVersion = "8.10.1"
+androidGradlePluginVersion = "8.13.2"
 
 androidxCoreLibVersion = "1.13.1"
 androidxActivityLibVersion = "1.8.2"
